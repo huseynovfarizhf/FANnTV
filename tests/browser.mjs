@@ -86,8 +86,58 @@ try {
  await page.getByRole('button',{name:'Refresh',exact:true}).click();
  await page.waitForFunction(()=>document.querySelector('.channel-form[data-id="2"] input[name=stream]')?.value==='https://example.com/channel.mp4');
  await page.screenshot({path:'test-results/admin-desktop.png',fullPage:true});
+
+ // Localization: public and authenticated screens, persistence, translated errors,
+ // local channel search, Baku regional formatting, and narrow mobile layouts.
+ for(const [code,welcome,login,password,signIn,search,nature,adminTitle] of [
+  ['az','Pulsuz sınağa başlayın','Artıq hesabım var','Şifrə','Daxil olun','Kanalları axtarın','Təbiət','İdarəetmə mərkəziniz.'],
+  ['ru','Начать бесплатный период','У меня уже есть аккаунт','Пароль','Войти','Поиск каналов','Природа','Ваш центр управления.'],
+  ['zh-CN','开始免费试用','我已有账户','密码','登录','搜索频道','自然','您的控制中心.'],
+ ]) {
+  const localized=await browser.newContext({viewport:{width:390,height:844},locale:code});
+  const lp=await localized.newPage();
+  lp.on('pageerror',e=>errors.push(e.message));
+  await lp.goto(base);
+  await lp.getByRole('button',{name:welcome,exact:true}).waitFor();
+  assert.equal(await lp.locator('html').getAttribute('lang'),code);
+  assert(await lp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await lp.getByRole('button',{name:login,exact:true}).click();
+  await lp.locator('input[name=email]').fill('admin@example.com');
+  await lp.getByLabel(password,{exact:true}).fill('wrong-password');
+  await lp.getByRole('button',{name:signIn,exact:true}).click();
+  await lp.waitForFunction(()=>document.querySelector('.form-error')?.textContent.trim().length>0);
+  assert(!await lp.locator('.form-error').textContent().then(t=>t.includes('Email or password')));
+  await lp.getByLabel(password,{exact:true}).fill('browser-test-password');
+  await lp.getByRole('button',{name:signIn,exact:true}).click();
+  await lp.locator('.topbar').waitFor();
+  await lp.getByLabel(search,{exact:true}).fill(nature);
+  assert.equal(await lp.locator('.channel-card').count(),1);
+  await lp.screenshot({path:`test-results/home-${code}-mobile.png`,fullPage:true});
+  assert(await lp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await lp.locator('.topbar .language-select').selectOption('en');
+  await lp.getByLabel('Search channels',{exact:true}).waitFor();
+  await lp.locator('.topbar .language-select').selectOption(code);
+  await lp.reload();
+  await lp.locator('.topbar').waitFor();
+  assert.equal(await lp.locator('html').getAttribute('lang'),code);
+  assert.equal(await lp.evaluate(()=>localStorage.getItem('fanntv-language')),code);
+  await lp.setViewportSize({width:1440,height:1080});
+  await lp.locator('button[data-view=admin]').first().click();
+  await lp.getByRole('heading',{name:adminTitle,exact:true}).waitFor();
+  const region=await lp.evaluate(()=>{
+   const options={day:'numeric',month:'numeric',year:'numeric',timeZone:'Asia/Baku'};
+   const formatter=new Intl.DateTimeFormat(locales[language],options);
+   return {formatted:regionalDate(new Date('2026-11-06T22:30:00Z'),options),expected:formatter.format(new Date('2026-11-06T22:30:00Z')),parts:formatter.formatToParts(new Date('2026-11-06T22:30:00Z'))};
+  });
+  assert.equal(region.formatted,region.expected);
+  assert.equal(Number(region.parts.find(p=>p.type==='day').value),7);
+  assert.equal(Number(region.parts.find(p=>p.type==='month').value),11);
+  assert.equal(Number(region.parts.find(p=>p.type==='year').value),2026);
+  await lp.screenshot({path:`test-results/admin-${code}.png`,fullPage:true});
+  await localized.close();
+ }
  assert.deepEqual(errors,[]);
- console.log('PASS: signup, persistent favorites, video playback, channel search, TV navigation, billing state, mobile layout, admin suspension, channel editing. No browser errors.');
+ console.log('PASS: signup, persistent favorites, video playback, channel search, TV navigation, billing state, mobile layout, admin suspension, channel editing. All four languages, translated errors/search, saved language preferences, and Azerbaijan timezone passed. No browser errors.');
 } finally {
  if(browser)await browser.close();
  child.kill('SIGTERM');

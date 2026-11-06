@@ -76,3 +76,11 @@ Android/iOS wrappers and their store billing integrations, Samsung Tizen packagi
 ## Assets
 
 Alpine artwork is generated for this project. The demo clip is generated from that artwork. HLS.js and the local font packages retain their license texts under `static/vendor/`.
+
+## Azerbaijan and languages
+
+The welcome page, user interface, TV controls, subscription screens, administrator dashboard, validation messages, and activity labels support **Azərbaycanca, English, Русский, and 简体中文 (Simplified Chinese)**. Use the language selector before signing in or in the header/settings. The selection is saved on the current device. On first use, a supported browser language is selected; other browser languages fall back to Azerbaijani. Channel brand names, user-entered information, and stream URLs are preserved. Search understands translated channel categories. Dates, greetings, and activity timestamps use **Asia/Baku**, with formatting appropriate to the selected language. The six-day trial is still measured as six elapsed 24-hour periods by the server.
+
+English message keys and complete Azerbaijani, Russian, and Chinese translations are maintained in `static/i18n.js`. New interface messages should be added there. Checkout receives the selected supported Stripe language; Azerbaijani uses English because Stripe Checkout does not support Azerbaijani. Built-in browser video controls and native form-validation messages follow the device/browser language.
+
+The displayed subscription prices remain explicitly illustrative **USD** amounts, formatted for the selected language. They are not converted to AZN or represented as Azerbaijani prices. Localizing the interface does not establish payment-provider availability in Azerbaijan: select a provider that supports your merchant's country, banking arrangements, and required currencies before launch. The existing Stripe integration requires an eligible merchant account; a local acquiring provider may require a separate integration. Streaming availability, store distribution, and payment acceptance from Azerbaijan have not been tested on local networks or devices.

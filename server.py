@@ -102,7 +102,7 @@ class Handler(BaseHTTPRequestHandler):
                 if not u:
                     return self.send_json({'error': 'Please sign in.'}, 401)
                 if path == '/api/channels':
-                    channels = [dict(r) for r in db.execute('SELECT id,name,category,title,description,art,enabled FROM channels WHERE enabled=1')]
+                    channels = [dict(r) for r in db.execute('SELECT id,name,category,title,description,art,enabled,(LENGTH(stream) > 0) AS connected FROM channels WHERE enabled=1')]
                     favorites = [r[0] for r in db.execute('SELECT channel_id FROM favorites WHERE user_id=?', (u['id'],))]
                     return self.send_json({'channels': channels, 'favorites': favorites})
                 if path.startswith('/api/play/'):
@@ -226,7 +226,7 @@ class Handler(BaseHTTPRequestHandler):
                     key = os.environ.get('STRIPE_SECRET_KEY')
                     if not (price and base and key and os.environ.get('STRIPE_WEBHOOK_SECRET')):
                         return self.send_json({'error': 'Payments are not connected yet. Ask the administrator to configure billing.'}, 503)
-                    fields = {'mode': 'subscription', 'line_items[0][price]': price, 'line_items[0][quantity]': 1, 'client_reference_id': u['id'], 'customer_email': u['email'], 'success_url': base+'/?payment=success', 'cancel_url': base+'/?payment=cancelled', 'subscription_data[metadata][user_id]': u['id']}
+                    fields = {'locale': {'az': 'en', 'en': 'en', 'ru': 'ru', 'zh-CN': 'zh'}.get(body.get('language'), 'en'), 'mode': 'subscription', 'line_items[0][price]': price, 'line_items[0][quantity]': 1, 'client_reference_id': u['id'], 'customer_email': u['email'], 'success_url': base+'/?payment=success', 'cancel_url': base+'/?payment=cancelled', 'subscription_data[metadata][user_id]': u['id']}
                     req = urllib.request.Request('https://api.stripe.com/v1/checkout/sessions', data=urllib.parse.urlencode(fields).encode(), headers={'Authorization': 'Bearer '+key})
                     try:
                         with urllib.request.urlopen(req, timeout=20) as response:
