@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# FANnTV development dependencies and browser artifacts
+node_modules/
+test-results/
+!.env.example
