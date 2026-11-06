@@ -1,6 +1,6 @@
 # FANnTV
 
-A working IPTV web application with responsive mobile layouts, a remote-friendly TV mode, and an administrator dashboard. Built with Python 3.12+, SQLite, and browser JavaScript. The application includes its fonts, HLS player, artwork, and a generated sample video locally; no CDN is required at runtime.
+IPTV web application for Azerbaijan, with mobile layouts, remote-friendly TV mode, a platform administrator dashboard, and family accounts. Python 3.12+, SQLite, and browser JavaScript. Fonts, HLS playback, artwork, and a generated demo video are included locally.
 
 ## Run
 
@@ -9,78 +9,84 @@ cd /workspace/FANnTV
 python3 server.py --port 3000
 ```
 
-Open the application through your environment's port viewer for port 3000, or open `http://localhost:3000` on your own machine. Create an account to start a six-day trial. The NATURE+ channel plays a ten-second generated sample clip. Other channels are placeholders until an administrator connects authorized sources.
+Open port 3000 through your development environment's viewer. Create an account to start a six-day free trial. NATURE+ plays a generated ten-second sample; other channels need your licensed sources.
 
-Create your administrator account in a separate terminal:
+Create the single platform administrator:
 
 ```sh
 python3 server.py --create-admin your-email@example.com
 ```
 
-Enter a unique password at the hidden prompt, then sign in normally. The Admin dashboard appears for administrator accounts. There are no built-in administrator credentials. Use the dashboard to inspect users, suspend/restore access, see activity, and enable or configure streams. SQLite data is retained in the ignored `instance/` directory. Back it up before replacing an environment. Override its location with `FANNTV_DB` if necessary.
+Enter a unique password at the hidden prompt. There are no default credentials. Sign in normally to access platform management. Only one platform administrator is permitted; migration stops for operator review if an older database contains multiple administrators. Existing checkouts and databases are retained. Data lives in ignored `instance/fanntv.db`, or the location selected by `FANNTV_DB`. Back up the database before deployment.
 
-## Included behavior
+## Account roles and devices
 
-- Welcome, account registration, sign in/out, and persistent HttpOnly cookie sessions.
-- Server-controlled six-day trial beginning at registration. An expired or suspended account cannot obtain playback URLs through the API.
-- Channel categories, search, favorites saved per account, MP4 playback, native HLS, and HLS.js fallback where MediaSource is supported.
-- Subscription selection, Stripe Checkout integration, and signature-verified, replay-safe `invoice.paid` notifications. Merely visiting a success URL does not activate access.
-- Administrator-only user management, channel source configuration, and recent activity (latest 100 entries).
-- Mobile navigation, install metadata, keyboard accessibility, and TV mode. In TV mode use arrows and Enter; Escape closes dialogs or returns home. Press `/` to search.
+- **Platform administrator:** manages users, channels, global/customer prices, confirmed payment receipts, and activity logs.
+- **Family owner:** pays for the household, adds sub-users, manages devices, and configures eligible parental controls. Each registered subscriber is the sole owner of their own household.
+- **Sub-users:** have separate email/password logins and favorites. They inherit their owner's service period and suspension, and cannot pay or manage the household.
 
-## Payments
+Each household includes one regular sub-user. A six-month package adds one extra sub-user place for six calendar months. That extra login stops working when its benefit expires. The regular member remains attached to the household, subject to its service expiry.
 
-The displayed $4.99 monthly and $39.99 annual prices are illustrative. Set your actual product prices in Stripe and keep the application display in sync before launch. Checkout always shows Stripe's authoritative price.
+A household can have up to **four signed-in device sessions across the owner and all sub-users combined**. This conservatively enforces four-device access; an idle signed-in device occupies a place until sign-out, revocation, or session expiry (30 days). Tabs sharing one browser session use one place. A fifth sign-in is rejected. The owner can revoke another device from Family & devices. Device admission and payment settlement use serialized database transactions to prevent concurrent requests exceeding limits.
 
-Configure these values securely in the runtime environment, never in source control:
+## Packages and parental controls
 
-| Variable | Purpose |
-| --- | --- |
-| `PUBLIC_URL` | External HTTPS origin of this deployment, without a trailing slash |
-| `STRIPE_SECRET_KEY` | Stripe secret API key |
-| `STRIPE_MONTHLY_PRICE` | Recurring monthly Stripe Price ID |
-| `STRIPE_YEARLY_PRICE` | Recurring annual Stripe Price ID |
-| `STRIPE_WEBHOOK_SECRET` | Signing secret for your webhook endpoint |
+Monthly, six-month, and yearly packages are prepaid purchases. A verified payment activates service or extends its existing paid expiry. Terms use calendar months in **Asia/Baku**, clamped to a valid day in the destination month. Trials remain six elapsed 24-hour periods.
 
-Register `PUBLIC_URL/api/stripe/webhook` for `invoice.paid` events. Checkout writes the internal user ID to subscription metadata. The webhook reads invoice subscription metadata and extends access to the paid billing period's end. Cancellation leaves access available until that date. Payment failures do not extend access. Refunds and disputes require manual suspension in this version. Checkout needs outbound access to `api.stripe.com`; channel providers must allow the client to load video, and HLS sources must supply appropriate CORS headers. No live payment or external stream provider has been configured or tested.
+Each six-month purchase also grants six calendar months of **parental controls and one additional sub-user**. Their expiry is tracked separately from service expiry. Renewing that package extends the benefit period from its current end; unrelated prepaid service does not multiply the bonus duration. The yearly package does not implicitly grant six-month family bonuses.
+
+While parental controls are active, the owner can choose allowed channel categories per sub-user. No selected categories blocks all channels; all categories permits unrestricted browsing. The server checks restrictions for channel lists, playback URLs, demo media, and player heartbeats. Existing restrictions remain enforced when the editing entitlement expires. Sub-users cannot change them.
+
+The app periodically refreshes entitlements; playback rechecks occur every 15 seconds. The protected local demo checks access on every request. External stream URLs still require provider-side signed URLs, short-lived playback tokens or DRM for protection outside this application. URL admission and client heartbeats cannot revoke an external URL already copied to another player.
+
+## AZN pricing and payments
+
+All package amounts are **Azerbaijan manat (AZN)**. They are stored as integer **qəpik**, where 100 qəpik = 1 AZN. Initial example prices are 4.99 AZN monthly, 24.99 AZN for six months, and 39.99 AZN yearly. Set your actual prices in the admin dashboard before accepting payments. No exchange-rate conversion is performed.
+
+The platform admin can increase/decrease each global package price or give a specific household its own price. A customer override takes precedence; removing it restores the global price. Changes apply to new purchases. Checkouts retain their frozen quoted amount and duration.
+
+Service activates **only after a verified paid notification whose currency and amount match the stored order**, or after the platform admin records a payment they have independently verified. Unpaid notifications, mismatched amounts/currencies, return URLs, and duplicate receipt retries cannot extend service. A receipt is globally unique. The admin receipt flow shows the current price and requires confirmation; it does not initiate a bank transfer or charge a card. A stale confirmed price is rejected.
+
+### Bank acquiring
+
+The requested bank/acquiring provider has not yet been named. A bank-adapter integration contract is provided so a bank-specific connector can be added without moving price or entitlement decisions into the browser. This is **not a completed direct integration with an unnamed bank**. Live charges are unavailable until the chosen provider's API, merchant credentials, HTTPS callback URL, and adapter are configured. Never enter credentials in source control or chat.
+
+See [PAYMENTS.md](PAYMENTS.md) for the adapter callback contract and optional Stripe configuration. Payment-return screens poll the stored order status and never activate access themselves. Bank payment acceptance, settlement, refunds, disputes, and real Azerbaijani-network access have not been validated. Refunds/disputes currently require manual suspension.
+
+## Languages
+
+**Azərbaycanca, English, Русский, 简体中文 (Simplified Chinese)** cover welcome, user/TV controls, subscriptions, family management, admin, errors, and activity labels. Choose a language before sign-in or in the header/settings. The device remembers the choice. A supported browser language is used initially; other languages fall back to Azerbaijani. User names, channel brands, emails, and stream URLs are preserved.
+
+Search understands translated categories. Dates and times use Asia/Baku with locale formatting. Built-in browser validation and native video controls follow the browser/device language. Message catalogs are in `static/i18n.js`. AZN is explicitly shown alongside localized numbers.
 
 ## Development and validation
 
-Runtime Python uses only the standard library. Vendored browser assets are included, so starting the server does not need npm. To refresh those assets from the pinned npm lockfile:
+Python runtime uses the standard library. Normal startup needs no npm install because browser assets are vendored. To refresh assets:
 
 ```sh
 npm ci --ignore-scripts
 npm run assets
 ```
 
-Run API integration tests:
+API integration tests:
 
 ```sh
 npm test
 ```
 
-Run browser workflow checks with Chromium installed:
+Browser workflows with Chromium installed:
 
 ```sh
 npm run test:browser
+npm run test:family
 ```
 
-Set `CHROMIUM_PATH` when Chromium is installed elsewhere. Browser tests create an isolated temporary database, create disposable test accounts, and remove them afterwards. Screenshots are written to ignored `test-results/`. API tests cover trial expiry, account sessions, passwords, favorites, authorization, suspension, request origins, payment configuration, signed webhook replay handling, rate limits, and video range requests.
+Set `CHROMIUM_PATH` if needed. Tests use isolated temporary databases; browser screenshots go to ignored `test-results/`. They exercise trial expiry, inherited family access, devices, parental restrictions, prices, verified payment activation and replay handling, calendar terms, localization, video playback, and administrator workflows. Real bank charges are not exercised.
 
 ## Deployment and store releases
 
-This is a functional web MVP, not a published native/store application. It has been tested in desktop Chromium and a mobile viewport; no physical TV or mobile hardware has been certified. An HTTPS reverse proxy, production hosting, database backups, monitoring, email verification/recovery, device/session management, billing self-service, and production security review remain before a public launch. The standard-library development server is not intended to be the public production edge.
+This is a web application, not published native/store packages. Desktop Chromium and mobile viewport tests do not certify physical TV/mobile hardware. Before public launch, complete HTTPS production hosting, backups, monitoring, email verification/recovery, billing self-service, provider-side playback protection, and a production security review. The Python standard-library development server is not a public production edge.
 
-Android/iOS wrappers and their store billing integrations, Samsung Tizen packaging, LG webOS packaging, and Android/Google TV packaging for supported Sony devices are separate release work. Store-specific subscriptions and review requirements must be implemented for each distribution target. A web manifest alone does not supply those packages. Account entitlement logic should remain server-side across all clients. DRM, signed provider playback URLs, program guides, M3U imports, catch-up TV, real video-on-demand catalogs, and concurrent-device limits are not included yet. Connect only content you are authorized to distribute.
+Android/iOS store billing and packages, Samsung Tizen, LG webOS, and Android/Google TV packaging for Sony remain separate release work. Program guides, M3U imports, catch-up TV, and full video-on-demand catalogs are not included. Connect only content you are authorized to distribute.
 
-## Assets
-
-Alpine artwork is generated for this project. The demo clip is generated from that artwork. HLS.js and the local font packages retain their license texts under `static/vendor/`.
-
-## Azerbaijan and languages
-
-The welcome page, user interface, TV controls, subscription screens, administrator dashboard, validation messages, and activity labels support **Azərbaycanca, English, Русский, and 简体中文 (Simplified Chinese)**. Use the language selector before signing in or in the header/settings. The selection is saved on the current device. On first use, a supported browser language is selected; other browser languages fall back to Azerbaijani. Channel brand names, user-entered information, and stream URLs are preserved. Search understands translated channel categories. Dates, greetings, and activity timestamps use **Asia/Baku**, with formatting appropriate to the selected language. The six-day trial is still measured as six elapsed 24-hour periods by the server.
-
-English message keys and complete Azerbaijani, Russian, and Chinese translations are maintained in `static/i18n.js`. New interface messages should be added there. Checkout receives the selected supported Stripe language; Azerbaijani uses English because Stripe Checkout does not support Azerbaijani. Built-in browser video controls and native form-validation messages follow the device/browser language.
-
-The displayed subscription prices remain explicitly illustrative **USD** amounts, formatted for the selected language. They are not converted to AZN or represented as Azerbaijani prices. Localizing the interface does not establish payment-provider availability in Azerbaijan: select a provider that supports your merchant's country, banking arrangements, and required currencies before launch. The existing Stripe integration requires an eligible merchant account; a local acquiring provider may require a separate integration. Streaming availability, store distribution, and payment acceptance from Azerbaijan have not been tested on local networks or devices.
+Alpine artwork and the demo clip are generated assets. Library/font license texts are retained under `static/vendor/`.

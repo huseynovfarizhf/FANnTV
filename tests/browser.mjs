@@ -55,7 +55,7 @@ try {
  await page.getByRole('button',{name:'Toggle TV mode'}).click();
  await page.locator('.sidebar').getByRole('button',{name:'Settings',exact:true}).click();
  await page.locator('#content').getByRole('button',{name:'Explore plans',exact:true}).click();
- await page.getByRole('button',{name:/Yearly SAVE/}).click();
+ await page.locator('button[data-plan=yearly]').click();
  await page.getByRole('button',{name:'Payments not connected yet'}).click();
  await page.getByRole('alert').filter({hasText:/Payments are not connected/}).waitFor();
  await page.screenshot({path:'test-results/plans.png',fullPage:true});

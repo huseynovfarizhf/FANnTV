@@ -51,6 +51,206 @@ messages('Please sign in.','Zəhmət olmasa daxil olun.','Пожалуйста, 
 messages('Six-day trial started','Altı günlük sınaq başladı','Начат шестидневный пробный период','六天试用已开始');messages('Signed in','Hesaba daxil oldu','Вход в аккаунт','已登录');messages('Subscription payment confirmed','Abunəlik ödənişi təsdiqləndi','Оплата подписки подтверждена','订阅付款已确认');
 messages('Language','Dil','Язык','语言');messages('Language and region','Dil və region','Язык и регион','语言与地区');messages('Dates and times use Azerbaijan time (Asia/Baku).','Tarix və vaxt Azərbaycan vaxtı ilə göstərilir (Asia/Baku).','Дата и время указаны по времени Азербайджана (Asia/Baku).','日期和时间使用阿塞拜疆时间（Asia/Baku）。');
 
+// Family, AZN billing, pricing, and device management.
+messages('Family','Ailə','Семья','家庭');
+messages('Family & devices','Ailə və cihazlar','Семья и устройства','家庭与设备');
+messages('Family and devices','Ailə və cihazlar','Семья и устройства','家庭与设备');
+messages('Your family','Ailəniz','Ваша семья','您的家庭');
+messages('Family account','Ailə hesabı','Семейный аккаунт','家庭账户');
+messages('Family owner','Ailə hesabının sahibi','Владелец семейного аккаунта','家庭账户所有者');
+messages('Account owner','Hesab sahibi','Владелец аккаунта','账户所有者');
+messages('Owner','Sahib','Владелец','所有者');
+messages('Sub-user','Alt istifadəçi','Дополнительный пользователь','子用户');
+messages('Sub-users','Alt istifadəçilər','Дополнительные пользователи','子用户');
+messages('Members','Üzvlər','Участники','成员');
+messages('Add sub-user','Alt istifadəçi əlavə edin','Добавить пользователя','添加子用户');
+messages('Add member','Üzv əlavə edin','Добавить участника','添加成员');
+messages('Remove member','Üzvü silin','Удалить участника','移除成员');
+messages('Member name','Üzvün adı','Имя участника','成员姓名');
+messages('Create sub-user','Alt istifadəçi yaradın','Создать пользователя','创建子用户');
+messages('Save member','Üzvü saxlayın','Сохранить участника','保存成员');
+messages('Remove','Silin','Удалить','移除');
+messages('Cancel','Ləğv edin','Отмена','取消');
+messages('Edit','Dəyişin','Изменить','编辑');
+messages('Update','Yeniləyin','Обновить','更新');
+messages('Active','Aktiv','Активен','有效');
+messages('Inactive','Aktiv deyil','Неактивен','未激活');
+messages('Parental controls','Valideyn nəzarəti','Родительский контроль','家长控制');
+messages('Allowed categories','İcazə verilən kateqoriyalar','Разрешённые категории','允许的分类');
+messages('All categories','Bütün kateqoriyalar','Все категории','所有分类');
+messages('Restricted categories','Məhdud kateqoriyalar','Ограниченные категории','受限分类');
+messages('No categories selected','Kateqoriya seçilməyib','Категории не выбраны','未选择分类');
+messages('Bonus sub-user','Əlavə alt istifadəçi','Бонусный пользователь','额外子用户');
+messages('Bonus active','Əlavə imkanlar aktivdir','Бонус активен','额外权益已生效');
+messages('Bonus expired','Əlavə imkanların müddəti bitib','Бонус истёк','额外权益已到期');
+messages('Six months','Altı ay','Шесть месяцев','六个月');
+messages('6 months','6 ay','6 месяцев','6个月');
+messages('Six-month package','Altı aylıq paket','Пакет на шесть месяцев','六个月套餐');
+messages('6-month package','6 aylıq paket','Пакет на 6 месяцев','6个月套餐');
+messages('/ 6 months','/ 6 ay','/ 6 месяцев','/6个月');
+messages('Six months in advance','Altı aylıq əvvəlcədən ödəniş','Шесть месяцев вперёд','预付六个月');
+messages('Parental controls + one extra sub-user','Valideyn nəzarəti və bir əlavə alt istifadəçi','Родительский контроль и ещё один пользователь','家长控制及一个额外子用户');
+messages('Devices','Cihazlar','Устройства','设备');
+messages('Your devices','Cihazlarınız','Ваши устройства','您的设备');
+messages('Active devices','Aktiv cihazlar','Активные устройства','活跃设备');
+messages('Device','Cihaz','Устройство','设备');
+messages('Device limit','Cihaz limiti','Лимит устройств','设备上限');
+messages('Four devices at the same time','Eyni vaxtda dörd cihaz','Четыре устройства одновременно','最多四台设备同时使用');
+messages('Up to 4 devices','4 cihaza qədər','До 4 устройств','最多4台设备');
+messages('Current device','Cari cihaz','Текущее устройство','当前设备');
+messages('This device','Bu cihaz','Это устройство','此设备');
+messages('Last seen','Son fəaliyyət','Последняя активность','上次活动');
+messages('Sign out device','Cihazdan çıxış edin','Выйти на устройстве','退出此设备');
+messages('Revoke device','Cihaz girişini ləğv edin','Отозвать доступ устройства','撤销设备访问');
+messages('No active devices.','Aktiv cihaz yoxdur.','Нет активных устройств.','暂无活跃设备。');
+messages('Paid until','Ödənişli girişin bitmə tarixi','Оплачено до','付费有效期至');
+messages('Active until','Aktivliyin bitmə tarixi','Действует до','有效期至');
+messages('Expires','Bitmə tarixi','Истекает','到期时间');
+messages('Payment history','Ödəniş tarixçəsi','История платежей','支付记录');
+messages('Payments','Ödənişlər','Платежи','支付');
+messages('Pricing','Qiymətlər','Цены','价格');
+messages('Price controls','Qiymətlərin idarə edilməsi','Управление ценами','价格管理');
+messages('Global pricing','Ümumi qiymətlər','Общие цены','全局定价');
+messages('Customer pricing','Müştəriyə fərdi qiymətlər','Индивидуальные цены','客户专属定价');
+messages('Customer-specific price','Müştəriyə fərdi qiymət','Индивидуальная цена','客户专属价格');
+messages('Price override','Fərdi qiymət','Индивидуальная цена','价格覆盖');
+messages('Global price','Ümumi qiymət','Общая цена','全局价格');
+messages('Customer price','Müştəri qiyməti','Цена для клиента','客户价格');
+messages('Use global price','Ümumi qiymətdən istifadə edin','Использовать общую цену','使用全局价格');
+messages('Reset to global price','Ümumi qiyməti bərpa edin','Вернуть общую цену','恢复全局价格');
+messages('All customers','Bütün müştərilər','Все клиенты','所有客户');
+messages('Customer','Müştəri','Клиент','客户');
+messages('Select customer','Müştəri seçin','Выберите клиента','选择客户');
+messages('Select plan','Plan seçin','Выберите тариф','选择套餐');
+messages('Plan','Plan','Тариф','套餐');
+messages('Amount','Məbləğ','Сумма','金额');
+messages('Amount (AZN)','Məbləğ (AZN)','Сумма (AZN)','金额（AZN）');
+messages('Price (AZN)','Qiymət (AZN)','Цена (AZN)','价格（AZN）');
+messages('Save price','Qiyməti saxlayın','Сохранить цену','保存价格');
+messages('Payment reference','Ödəniş istinadı','Номер платежа','支付参考号');
+messages('Reference','İstinad','Номер','参考号');
+messages('Record payment','Ödənişi qeydə alın','Зарегистрировать оплату','登记付款');
+messages('Confirm payment','Ödənişi təsdiqləyin','Подтвердить оплату','确认付款');
+messages('Confirm received payment','Alınmış ödənişi təsdiqləyin','Подтвердить полученную оплату','确认已收付款');
+messages('Manual payment','Əl ilə qeydə alınmış ödəniş','Оплата вручную','手动付款');
+messages('Pending','Gözləmədə','Ожидается','待处理');
+messages('Payment pending','Ödəniş gözlənilir','Ожидание оплаты','等待支付');
+messages('Awaiting payment confirmation','Ödəniş təsdiqi gözlənilir','Ожидается подтверждение оплаты','等待付款确认');
+messages('Payment confirmed','Ödəniş təsdiqləndi','Оплата подтверждена','付款已确认');
+messages('Payment recorded','Ödəniş qeydə alındı','Оплата зарегистрирована','付款已登记');
+messages('Payment successful','Ödəniş uğurludur','Оплата прошла успешно','付款成功');
+messages('Membership activated','Abunəlik aktivləşdirildi','Подписка активирована','会员已激活');
+messages('Price saved','Qiymət saxlanıldı','Цена сохранена','价格已保存');
+messages('Family member saved','Ailə üzvü saxlanıldı','Участник семьи сохранён','家庭成员已保存');
+messages('Family member removed','Ailə üzvü silindi','Участник семьи удалён','家庭成员已移除');
+messages('Device signed out','Cihazdan çıxış edildi','Выполнен выход на устройстве','设备已退出');
+messages('No payments yet.','Hələ ödəniş yoxdur.','Платежей пока нет.','暂无付款。');
+messages('No sub-users yet.','Hələ alt istifadəçi yoxdur.','Дополнительных пользователей пока нет.','暂无子用户。');
+messages('Only the account owner can manage family members.','Ailə üzvlərini yalnız hesab sahibi idarə edə bilər.','Только владелец аккаунта может управлять участниками семьи.','只有账户所有者可以管理家庭成员。');
+messages('Only the account owner can manage payments.','Ödənişləri yalnız hesab sahibi idarə edə bilər.','Только владелец аккаунта может управлять оплатой.','只有账户所有者可以管理付款。');
+messages('This channel is restricted by parental controls.','Bu kanal valideyn nəzarəti ilə məhdudlaşdırılıb.','Этот канал ограничен родительским контролем.','此频道受家长控制限制。');
+messages('Four devices are already signed in. Sign out another device first.','Artıq dörd cihazdan giriş edilib. Əvvəlcə başqa cihazdan çıxış edin.','Уже выполнен вход на четырёх устройствах. Сначала выйдите на другом.','已有四台设备登录，请先退出其他设备。');
+messages('The additional sub-user benefit has expired.','Əlavə alt istifadəçi imkanının müddəti bitib.','Срок бонусного пользователя истёк.','额外子用户权益已到期。');
+messages('Six-month parental controls are not active.','Altı aylıq valideyn nəzarəti aktiv deyil.','Родительский контроль на шесть месяцев не активен.','六个月家长控制未生效。');
+
+messages('Account owner not found.','Hesab sahibi tapılmadı.','Владелец аккаунта не найден.','未找到账户所有者。');
+messages('Only the account owner can manage the family or payments.','Ailəni və ödənişləri yalnız hesab sahibi idarə edə bilər.','Только владелец аккаунта может управлять семьёй и оплатой.','只有账户所有者可以管理家庭或付款。');
+messages('Account owner not found or suspended.','Hesab sahibi tapılmadı və ya hesabı dayandırılıb.','Владелец аккаунта не найден или заблокирован.','未找到账户所有者或其账户已停用。');
+messages('Invalid service package.','Yanlış xidmət paketi.','Некорректный пакет услуг.','无效服务套餐。');
+messages('Order not found.','Sifariş tapılmadı.','Заказ не найден.','未找到订单。');
+messages('Payment amount or currency does not match the order.','Ödəniş məbləği və ya valyutası sifarişə uyğun deyil.','Сумма или валюта платежа не совпадает с заказом.','付款金额或币种与订单不符。');
+messages('Payment reference is already used by another order.','Ödəniş istinadı artıq başqa sifarişdə istifadə olunub.','Номер платежа уже использован в другом заказе.','此支付参考号已用于其他订单。');
+messages('Invalid channel categories.','Yanlış kanal kateqoriyaları.','Некорректные категории каналов.','无效频道分类。');
+messages('A six-month package is required to change parental controls.','Valideyn nəzarətini dəyişmək üçün altı aylıq paket tələb olunur.','Для изменения родительского контроля нужен пакет на шесть месяцев.','更改家长控制需要六个月套餐。');
+messages('Billing not configured.','Ödəniş sistemi quraşdırılmayıb.','Оплата не настроена.','支付尚未配置。');
+messages('Device not found.','Cihaz tapılmadı.','Устройство не найдено.','未找到设备。');
+messages('Sub-user not found.','Alt istifadəçi tapılmadı.','Дополнительный пользователь не найден.','未找到子用户。');
+messages('Your sub-user limit has been reached. A six-month package unlocks one additional sub-user.','Alt istifadəçi limitinizə çatmısınız. Altı aylıq paket bir əlavə alt istifadəçi imkanı yaradır.','Достигнут лимит дополнительных пользователей. Пакет на шесть месяцев добавляет ещё одного.','已达到子用户上限，六个月套餐可增加一个子用户。');
+messages('Invalid webhook.','Yanlış ödəniş bildirişi.','Некорректное уведомление об оплате.','无效支付通知。');
+messages('Playback access required.','İzləmə icazəsi tələb olunur.','Требуется доступ к просмотру.','需要播放访问权限。');
+messages('Enter a positive AZN amount with at most two decimal places.','Vergüldən sonra ən çox iki rəqəmi olan müsbət AZN məbləği daxil edin.','Введите положительную сумму в AZN, не более двух знаков после запятой.','请输入正数AZN金额，最多保留两位小数。');
+messages('A global price is required.','Ümumi qiymət tələb olunur.','Необходимо указать общую цену.','必须设置全局价格。');
+messages('Enter a unique verified payment reference.','Təsdiqlənmiş ödənişin unikal istinadını daxil edin.','Укажите уникальный номер подтверждённого платежа.','请输入已核实付款的唯一参考号。');
+messages('Payment checkout session does not match the order.','Ödəniş sessiyası sifarişə uyğun deyil.','Платёжная сессия не соответствует заказу.','结账会话与订单不符。');
+messages('Price changed. Refresh the current price and try again.','Qiymət dəyişib. Cari qiyməti yeniləyin və yenidən cəhd edin.','Цена изменилась. Обновите текущую цену и повторите попытку.','价格已变更，请刷新当前价格后重试。');
+messages('This bonus sub-user has expired. Ask the account owner to renew.','Bu əlavə alt istifadəçinin müddəti bitib. Hesab sahibindən yeniləməsini xahiş edin.','Срок бонусного пользователя истёк. Попросите владельца аккаунта продлить пакет.','此额外子用户已到期，请联系账户所有者续费。');
+messages('Four devices are already signed in. The account owner can remove a device in Family settings.','Artıq dörd cihazdan giriş edilib. Hesab sahibi Ailə parametrlərində bir cihazın girişini ləğv edə bilər.','Уже выполнен вход на четырёх устройствах. Владелец аккаунта может удалить устройство в семейных настройках.','已有四台设备登录，账户所有者可在家庭设置中移除设备。');
+messages('Family device revoked','Ailə cihazının girişi ləğv edildi','Доступ семейного устройства отозван','家庭设备访问已撤销');
+messages('Sub-user removed','Alt istifadəçi silindi','Дополнительный пользователь удалён','子用户已移除');
+messages('Family member updated','Ailə üzvü yeniləndi','Участник семьи обновлён','家庭成员已更新');
+messages('AZN pricing updated','AZN qiymətləri yeniləndi','Цены в AZN обновлены','AZN价格已更新');
+messages('Verified manual payment recorded','Təsdiqlənmiş ödəniş əl ilə qeydə alındı','Подтверждённая ручная оплата зарегистрирована','已登记核实后的手动付款');
+
+messages('Membership is managed by your account owner.','Abunəliyi hesab sahibiniz idarə edir.','Подпиской управляет владелец вашего аккаунта.','会员由您的账户所有者管理。');
+messages('Manage family','Ailəni idarə edin','Управление семьёй','管理家庭');
+messages('One account owner. Up to four devices at the same time.','Bir hesab sahibi. Eyni vaxtda dörd cihaza qədər.','Один владелец аккаунта. До четырёх устройств одновременно.','一位账户所有者，最多四台设备同时使用。');
+messages('Contact your account owner.','Hesab sahibinizlə əlaqə saxlayın.','Свяжитесь с владельцем вашего аккаунта.','请联系您的账户所有者。');
+messages('Choose your package. All prices are in Azerbaijan manat.','Paketinizi seçin. Bütün qiymətlər Azərbaycan manatı ilədir.','Выберите пакет. Все цены указаны в азербайджанских манатах.','请选择套餐，所有价格均以阿塞拜疆马纳特计价。');
+messages('FAMILY PLUS','AİLƏ PLUS','СЕМЬЯ ПЛЮС','家庭升级');
+messages('Six months of service, parental controls, and one extra sub-user.','Altı aylıq xidmət, valideyn nəzarəti və bir əlavə alt istifadəçi.','Шесть месяцев просмотра, родительский контроль и ещё один пользователь.','六个月服务、家长控制及一个额外子用户。');
+messages('Up to four devices at the same time','Eyni vaxtda dörd cihaza qədər','До четырёх устройств одновременно','最多四台设备同时使用');
+messages('Prices set by your administrator','Qiymətləri administrator təyin edir','Цены устанавливает администратор','价格由管理员设置');
+messages('Payment activates your package only after verified confirmation.','Paketiniz yalnız ödəniş təsdiqləndikdən sonra aktivləşir.','Пакет активируется только после проверки и подтверждения оплаты.','只有付款经核实确认后，套餐才会激活。');
+messages('Package','Paket','Пакет','套餐');
+messages('A customer price overrides the global price for future purchases.','Fərdi müştəri qiyməti gələcək alışlarda ümumi qiyməti əvəz edir.','Индивидуальная цена заменяет общую для будущих покупок.','客户专属价格将用于后续购买，覆盖全局价格。');
+messages('AZN pricing','AZN qiymətləri','Цены в AZN','AZN定价');
+messages('Change prices for everyone or set a price for one account owner.','Hamı üçün qiymətləri dəyişin və ya bir hesab sahibinə fərdi qiymət təyin edin.','Измените цены для всех или задайте цену отдельному владельцу аккаунта.','更改所有用户的价格，或为某位账户所有者设置专属价格。');
+messages('Global prices','Ümumi qiymətlər','Общие цены','全局价格');
+messages('Select account owner','Hesab sahibini seçin','Выберите владельца аккаунта','选择账户所有者');
+messages('Price changes apply to new purchases. Confirmed payments and active service dates do not change.','Qiymət dəyişiklikləri yeni alışlara tətbiq olunur. Təsdiqlənmiş ödənişlər və aktiv xidmət tarixləri dəyişmir.','Изменения цен действуют для новых покупок. Подтверждённые платежи и сроки действующих услуг не меняются.','价格变更适用于新购买。已确认付款和现有服务期限不受影响。');
+messages('Record confirmed payment','Təsdiqlənmiş ödənişi qeydə alın','Зарегистрировать подтверждённую оплату','登记已核实付款');
+messages('Use this only after checking a received bank or cash payment. Confirmation activates service immediately.','Yalnız bank və ya nağd ödənişin alındığını yoxladıqdan sonra istifadə edin. Təsdiq xidməti dərhal aktivləşdirir.','Используйте только после проверки полученного банковского или наличного платежа. Подтверждение сразу активирует услугу.','仅在核实已收到银行转账或现金付款后使用。确认后将立即激活服务。');
+messages('Receipt reference','Qəbz istinadı','Номер квитанции','收款凭证编号');
+messages('Bank or receipt reference','Bank və ya qəbz istinadı','Номер банковского платежа или квитанции','银行交易号或收款凭证编号');
+messages('I have verified that this payment was received.','Bu ödənişin alındığını yoxlayıb təsdiqləmişəm.','Я проверил, что эта оплата получена.','我已核实收到此笔付款。');
+messages('Review and activate','Yoxlayın və aktivləşdirin','Проверить и активировать','核对并激活');
+messages('Account role','Hesabdakı rol','Роль аккаунта','账户角色');
+messages('Platform administrator','Platforma administratoru','Администратор платформы','平台管理员');
+messages('YOUR FAMILY, TOGETHER','AİLƏNİZ BİR ARADA','ВАША СЕМЬЯ ВМЕСТЕ','家人相聚');
+messages('Service active until','Xidmətin bitmə tarixi','Услуга действует до','服务有效期至');
+messages('Sub-user places','Alt istifadəçi yerləri','Места для пользователей','子用户名额');
+messages('Six-month benefits until','Altı aylıq imkanların bitmə tarixi','Бонусы шестимесячного пакета до','六个月权益有效期至');
+messages('Family members','Ailə üzvləri','Участники семьи','家庭成员');
+messages('The owner manages payment and family access. Sub-users have their own sign-in.','Hesab sahibi ödənişi və ailə girişini idarə edir. Alt istifadəçilər ayrıca daxil olur.','Владелец управляет оплатой и семейным доступом. У дополнительных пользователей свой вход.','账户所有者管理付款及家庭访问权限，子用户拥有独立登录信息。');
+messages('Six-month extra sub-user','Altı aylıq əlavə alt istifadəçi','Бонусный пользователь на шесть месяцев','六个月额外子用户');
+messages('Standard sub-user','Standart alt istifadəçi','Обычный дополнительный пользователь','标准子用户');
+messages('Available until','İstifadə müddəti','Доступен до','可用至');
+messages('No categories allowed','Heç bir kateqoriyaya icazə verilmir','Нет разрешённых категорий','未允许任何分类');
+messages('No sub-users yet. Add someone to your account.','Hələ alt istifadəçi yoxdur. Hesabınıza bir üzv əlavə edin.','Дополнительных пользователей пока нет. Добавьте участника в свой аккаунт.','暂无子用户，请为账户添加成员。');
+messages('Choose which categories each sub-user can watch. Restrictions are enforced by the server and remain in place if the feature expires.','Hər alt istifadəçinin izləyə biləcəyi kateqoriyaları seçin. Məhdudiyyətlər serverdə tətbiq olunur və funksiyanın müddəti bitsə də qüvvədə qalır.','Выберите категории для каждого пользователя. Ограничения применяются сервером и сохраняются после истечения срока функции.','选择各子用户可观看的分类。限制由服务器执行，即使功能到期也将保留。');
+messages('Pay for six months in advance to unlock parental controls and one additional sub-user for that paid period.','Ödənişli dövr üçün valideyn nəzarətini və bir əlavə alt istifadəçini aktivləşdirmək məqsədilə altı aylıq əvvəlcədən ödəniş edin.','Оплатите шесть месяцев вперёд, чтобы получить родительский контроль и ещё одного пользователя на оплаченный период.','预付六个月即可在该付费期间获得家长控制及一个额外子用户。');
+messages('Four devices share this household limit. Sign out an old device to connect a new one.','Ailənin ümumi limiti dörd cihazdır. Yeni cihaz qoşmaq üçün köhnə cihazdan çıxış edin.','Общий семейный лимит — четыре устройства. Выйдите на старом устройстве, чтобы подключить новое.','家庭账户共用四台设备名额。连接新设备前，请先退出旧设备。');
+messages('FAMILY & DEVICES','AİLƏ VƏ CİHAZLAR','СЕМЬЯ И УСТРОЙСТВА','家庭与设备');
+messages('Edit sub-user','Alt istifadəçini dəyişin','Изменить пользователя','编辑子用户');
+messages('New password (optional)','Yeni şifrə (istəyə görə)','Новый пароль (необязательно)','新密码（可选）');
+messages('Use the six-month extra sub-user place','Altı aylıq əlavə alt istifadəçi yerindən istifadə edin','Использовать бонусное место на шесть месяцев','使用六个月额外子用户名额');
+messages('Select categories to allow. Leave all unchecked to block all channels.','İcazə verilən kateqoriyaları seçin. Bütün kanalları bloklamaq üçün heç birini seçməyin.','Выберите разрешённые категории. Не выбирайте ни одной, чтобы закрыть все каналы.','请选择允许的分类。如需屏蔽所有频道，请全部取消勾选。');
+messages('Parental controls require an active six-month package.','Valideyn nəzarəti üçün aktiv altı aylıq paket tələb olunur.','Для родительского контроля нужен действующий шестимесячный пакет.','家长控制需要有效的六个月套餐。');
+messages('Save sub-user','Alt istifadəçini saxlayın','Сохранить пользователя','保存子用户');
+messages('Confirm','Təsdiqləyin','Подтвердить','确认');
+messages('Your session ended. Please sign in again.','Sessiyanız bitib. Yenidən daxil olun.','Сеанс завершён. Войдите снова.','您的登录会话已结束，请重新登录。');
+messages('Payment confirmed. Your service is active.','Ödəniş təsdiqləndi. Xidmətiniz aktivdir.','Оплата подтверждена. Услуга активна.','付款已确认，服务已激活。');
+messages('Waiting for verified payment confirmation.','Ödənişin yoxlanılması və təsdiqi gözlənilir.','Ожидается проверка и подтверждение оплаты.','正在等待经核实的付款确认。');
+messages('Payment confirmation is still pending. Your account will update automatically.','Ödəniş təsdiqi hələ gözlənilir. Hesabınız avtomatik yenilənəcək.','Подтверждение оплаты ещё ожидается. Аккаунт обновится автоматически.','付款确认仍在处理中，账户将自动更新。');
+messages('Remove sub-user','Alt istifadəçini silin','Удалить пользователя','移除子用户');
+messages('This sub-user will lose access to your account.','Bu alt istifadəçi hesabınıza girişini itirəcək.','Этот пользователь потеряет доступ к вашему аккаунту.','此子用户将失去账户访问权限。');
+messages('The selected device will need to sign in again.','Seçilmiş cihazdan yenidən daxil olmaq lazım gələcək.','На выбранном устройстве потребуется войти заново.','所选设备需要重新登录。');
+messages('Customer price reset','Müştəri qiyməti sıfırlandı','Индивидуальная цена сброшена','客户专属价格已重置');
+messages('Amount to verify','Yoxlanılacaq məbləğ','Сумма для проверки','待核实金额');
+messages('Enter a valid AZN amount with up to two decimal places.','Vergüldən sonra ən çox iki rəqəmi olan düzgün AZN məbləği daxil edin.','Введите корректную сумму в AZN, не более двух знаков после запятой.','请输入有效的AZN金额，最多保留两位小数。');
+messages('Sub-user saved','Alt istifadəçi saxlanıldı','Пользователь сохранён','子用户已保存');
+messages('Activate verified payment','Təsdiqlənmiş ödənişi aktivləşdirin','Активировать подтверждённую оплату','激活已核实付款');
+messages('Confirm the receipt reference and amount before activating service.','Xidməti aktivləşdirməzdən əvvəl qəbz istinadını və məbləği yoxlayın.','Перед активацией услуги проверьте номер квитанции и сумму.','激活服务前，请核对收款凭证编号和金额。');
+messages('Payment recorded. Service activated.','Ödəniş qeydə alındı. Xidmət aktivləşdirildi.','Оплата зарегистрирована. Услуга активирована.','付款已登记，服务已激活。');
+messages('Activate service','Xidməti aktivləşdirin','Активировать услугу','激活服务');
+messages('pending','gözləmədə','ожидается','待处理');
+messages('paid','ödənilib','оплачено','已付费');
+messages('Browser','Brauzer','Браузер','浏览器');
+
+messages('Card details are entered securely on the payment provider’s page. FANnTV never stores your card or CVV.','Kart məlumatları ödəniş təminatçısının səhifəsində təhlükəsiz daxil edilir. FANnTV kart məlumatlarınızı və CVV kodunuzu heç vaxt saxlamır.','Данные карты вводятся безопасно на странице платёжного провайдера. FANnTV никогда не хранит данные вашей карты или CVV.','银行卡信息将在支付服务提供商的页面安全输入。FANnTV从不存储您的卡信息或CVV安全码。');
+
+messages('Order has already been paid with another payment reference.','Bu sifariş artıq başqa ödəniş istinadı ilə ödənilib.','Этот заказ уже оплачен с другим платёжным идентификатором.','此订单已通过其他付款凭证支付。');
+
 function supportedLanguage(value) {
   const base=String(value||'').toLowerCase().split('-')[0];
   return base==='zh'?'zh-CN':['az','en','ru'].includes(base)?base:null;
@@ -65,6 +265,7 @@ function t(source) {
   if(match){const n=match[1];return {az:`Sınaq müddətinin bitməsinə ${n} gün qalıb`,ru:`До конца пробного периода: ${n} дн.`,'zh-CN':`试用还剩${n}天`}[language];}
   match=source.match(/^Good (morning|afternoon|evening), (.*)$/);
   if(match){const greeting={az:{morning:'Sabahınız xeyir',afternoon:'Günortanız xeyir',evening:'Axşamınız xeyir'},ru:{morning:'Доброе утро',afternoon:'Добрый день',evening:'Добрый вечер'},'zh-CN':{morning:'早上好',afternoon:'下午好',evening:'晚上好'}};return `${greeting[language][match[1]]}, ${match[2]}`;}
+  match=source.match(/^(Monthly|Six months|Yearly) price in AZN$/);if(match){const name=t(match[1]);return {az:`${name} qiyməti (AZN)`,ru:`Цена ${name} (AZN)`,'zh-CN':`${name}价格（AZN）`}[language];}
   match=source.match(/^Watch (.+)$/);if(match)return {az:`${match[1]} izləyin`,ru:`Смотреть ${match[1]}`,'zh-CN':`观看${match[1]}`}[language];
   match=source.match(/^(.+) stream URL$/);if(match)return {az:`${match[1]} yayım ünvanı`,ru:`URL потока ${match[1]}`,'zh-CN':`${match[1]}流地址`}[language];
   match=source.match(/^Playback: (.+)$/);if(match)return {az:`İzləmə: ${match[1]}`,ru:`Просмотр: ${match[1]}`,'zh-CN':`播放：${match[1]}`}[language];
@@ -73,11 +274,11 @@ function t(source) {
   return source;
 }
 function regionalDate(value, options={}) { return new Intl.DateTimeFormat(locales[language],{timeZone:'Asia/Baku',...options}).format(value); }
-function regionalPrice(value) { return new Intl.NumberFormat(locales[language],{style:'currency',currency:'USD'}).format(value); }
+function regionalPrice(value) { return new Intl.NumberFormat(locales[language],{style:'currency',currency:'AZN',currencyDisplay:'code'}).format(value); }
 function bakuHour(){return Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Baku',hour:'numeric',hourCycle:'h23'}).format(new Date()));}
 function languageSelect(){return `<label class="language-control"><span aria-hidden="true">◎</span><select class="language-select" aria-label="${t('Language')}">${Object.entries(LANGUAGES).map(([code,name])=>`<option value="${code}" ${code===language?'selected':''}>${name}</option>`).join('')}</select></label>`;}
 function localizeTree(root=document.body) {
-  const skip='script,style,option,.brand,.avatar,.channel-wordmark,.channel-info h3,.channel-form>strong,.profile strong,td:first-child strong,td:first-child small,[data-user-content]';
+  const skip='script,style,.language-select option,.brand,.avatar,.channel-wordmark,.channel-info h3,.channel-form>strong,.profile strong,td:first-child strong,td:first-child small,[data-user-content]';
   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
   const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
   for(const node of nodes){if(node.parentElement?.closest(skip))continue;const text=node.textContent,trimmed=text.trim();const result=t(trimmed);if(result!==trimmed)node.textContent=text.replace(trimmed,result);}
