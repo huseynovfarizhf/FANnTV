@@ -39,10 +39,10 @@ class ApplicationTests(unittest.TestCase):
         self.client=self.new_client()
         self.env=patch.dict(os.environ,{},clear=False)
         self.env.start()
-        for key in ['STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','PUBLIC_URL','FANNTV_BANK_ADAPTER_URL','FANNTV_BANK_ADAPTER_KEY','FANNTV_PAYMENT_WEBHOOK_SECRET']:
+        for key in ['STRIPE_SECRET_KEY','STRIPE_WEBHOOK_SECRET','PUBLIC_URL','FANNTV_BANK_ADAPTER_URL','FANNTV_BANK_ADAPTER_KEY','FANNTV_PAYMENT_WEBHOOK_SECRET','FANNTV_ENV','FANNTV_SMTP_HOST','FANNTV_SMTP_FROM','FANNTV_SMTP_USERNAME','FANNTV_SMTP_PASSWORD','FANNTV_SMTP_MODE','FANNTV_SMTP_PORT']:
             os.environ.pop(key,None)
         with server.connect() as db:
-            for table in ['users','sessions','favorites','logs','attempts','payments','orders','receipts','price_overrides','plans']:
+            for table in ['users','sessions','favorites','logs','attempts','payments','orders','receipts','price_overrides','plans','account_tokens','account_limits']:
                 db.execute('DELETE FROM '+table)
             db.executemany('INSERT INTO plans VALUES(?,?,?,?)',server.PLAN_SPECS)
 
@@ -329,7 +329,7 @@ class ApplicationTests(unittest.TestCase):
             captured.append(json.loads(req.data))
             self.assertEqual(req.headers['Authorization'],'Bearer test-adapter-key')
             return io.BytesIO(json.dumps({'checkout_url':'https://bank.example/hosted/payment','session_id':'bank-session-1'}).encode())
-        with patch('server.urllib.request.urlopen',side_effect=bank):
+        with patch('server.provider_urlopen',side_effect=bank):
             status,data=self.request('checkout',{'plan':'six_month','amount_minor':1,'currency':'USD'})
         self.assertEqual(status,200,data)
         self.assertEqual(data['url'],'https://bank.example/hosted/payment')
@@ -342,7 +342,7 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(self.signed(event)[0],200)
         self.assertTrue(self.owner_row(user['id'])['paid_until']>time.time())
         self.assertEqual(self.request('orders')[1]['orders'][0]['status'],'paid')
-        with patch('server.urllib.request.urlopen',return_value=io.BytesIO(b'{"checkout_url":"javascript:alert(1)"}')):
+        with patch('server.provider_urlopen',return_value=io.BytesIO(b'{"checkout_url":"javascript:alert(1)"}')):
             self.assertEqual(self.request('checkout',{'plan':'monthly'})[0],502)
 
     def test_stripe_paid_checkout_requires_verified_session_and_quote(self):
@@ -352,7 +352,7 @@ class ApplicationTests(unittest.TestCase):
         def provider(req,timeout):
             captured.append(urllib.parse.parse_qs(req.data.decode()))
             return io.BytesIO(b'{"id":"cs_verified","url":"https://checkout.stripe.com/test"}')
-        with patch('server.urllib.request.urlopen',side_effect=provider):
+        with patch('server.provider_urlopen',side_effect=provider):
             status,data=self.request('checkout',{'plan':'six_month','amount_minor':1})
         self.assertEqual(status,200,data)
         self.assertEqual(captured[0]['line_items[0][price_data][unit_amount]'],['2499'])

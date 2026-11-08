@@ -8,6 +8,7 @@ import os
 import secrets
 import sqlite3
 import time
+import threading
 import urllib.parse
 import urllib.request
 from datetime import datetime
@@ -15,6 +16,9 @@ from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+import account_security
+import playback
 
 ROOT = Path(__file__).parent
 DB = os.environ.get('FANNTV_DB', str(ROOT / 'instance' / 'fanntv.db'))
@@ -30,8 +34,16 @@ class RequestError(Exception):
         self.message, self.status = message, status
 
 
+class ClosingConnection(sqlite3.Connection):
+    def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            return super().__exit__(exc_type,exc_value,traceback)
+        finally:
+            self.close()
+
+
 def connect():
-    db = sqlite3.connect(DB, timeout=20)
+    db = sqlite3.connect(DB, timeout=20, factory=ClosingConnection)
     db.row_factory = sqlite3.Row
     return db
 
@@ -48,6 +60,7 @@ def verify(password, encoded):
 def initialize():
     Path(DB).parent.mkdir(parents=True, exist_ok=True)
     with connect() as db:
+        db.execute('PRAGMA journal_mode=WAL')
         db.executescript('''
         CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, email TEXT UNIQUE, name TEXT, password TEXT, role TEXT DEFAULT 'user', created REAL, paid_until REAL DEFAULT 0, suspended INTEGER DEFAULT 0);
         CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY, user_id INTEGER, expires REAL);
@@ -62,7 +75,7 @@ def initialize():
         CREATE TABLE IF NOT EXISTS receipts(transaction_id TEXT PRIMARY KEY, order_id TEXT UNIQUE, event_id TEXT UNIQUE, provider TEXT, created REAL);
         ''')
         additions = {
-            'users': [('owner_id', 'INTEGER'), ('parental_until', 'REAL DEFAULT 0'), ('bonus_until', 'REAL DEFAULT 0'), ('bonus', 'INTEGER DEFAULT 0'), ('allowed_categories', 'TEXT')],
+            'users': [('owner_id', 'INTEGER'), ('parental_until', 'REAL DEFAULT 0'), ('bonus_until', 'REAL DEFAULT 0'), ('bonus', 'INTEGER DEFAULT 0'), ('allowed_categories', 'TEXT'), ('email_verified', 'INTEGER NOT NULL DEFAULT 0')],
             'sessions': [('id', 'TEXT'), ('label', "TEXT DEFAULT 'Browser'"), ('last_seen', 'REAL DEFAULT 0')],
         }
         for table, columns in additions.items():
@@ -70,9 +83,11 @@ def initialize():
             for column, declaration in columns:
                 if column not in present:
                     db.execute(f'ALTER TABLE {table} ADD COLUMN {column} {declaration}')
+        account_security.initialize(db)
         for row in db.execute('SELECT token FROM sessions WHERE id IS NULL').fetchall():
             db.execute('UPDATE sessions SET id=? WHERE token=?', (secrets.token_urlsafe(12), row['token']))
         db.execute('CREATE UNIQUE INDEX IF NOT EXISTS sessions_public_id ON sessions(id)')
+        db.execute('CREATE INDEX IF NOT EXISTS sessions_user_expiry ON sessions(user_id,expires)')
         # Existing databases with multiple administrators require operator review.
         if db.execute("SELECT COUNT(*) FROM users WHERE role='admin'").fetchone()[0] > 1:
             raise RuntimeError('Only one platform administrator is supported. Review existing administrator accounts before migration.')
@@ -109,11 +124,14 @@ def public_user(u, db=None):
         raise RequestError('Account owner not found.', 403)
     trial_end = owner['created'] + TRIAL
     active = not u['bonus'] or owner['bonus_until'] > now
-    access = active and not u['suspended'] and not owner['suspended'] and (owner['role'] == 'admin' or max(trial_end, owner['paid_until']) > now)
+    email_verified = bool(owner['email_verified'])
+    requires_verification = account_security.production_mode() and owner['role'] != 'admin' and not email_verified
+    access = not requires_verification and active and not u['suspended'] and not owner['suspended'] and (owner['role'] == 'admin' or max(trial_end, owner['paid_until']) > now)
     return dict(id=u['id'], email=u['email'], name=u['name'], role=u['role'], owner_id=owner['id'],
                 account_role='platform_admin' if u['role'] == 'admin' else 'subuser' if u['owner_id'] else 'owner',
                 trial_end=trial_end, paid_until=owner['paid_until'], suspended=bool(u['suspended'] or owner['suspended']), access=bool(access), active=bool(active),
                 parental_until=owner['parental_until'], bonus_until=owner['bonus_until'], subuser_limit=2 if owner['bonus_until'] > now else 1,
+                email_verified=email_verified, own_email_verified=bool(u['email_verified']), requires_email_verification=requires_verification,
                 can_manage_family=not u['owner_id'] and not u['suspended'])
 
 
@@ -189,6 +207,39 @@ def billing_ready():
     return bool(os.environ.get('PUBLIC_URL', '').startswith('https://') and selected)
 
 
+def secure_provider_url(value):
+    if not isinstance(value,str) or any(c.isspace() or ord(c)<32 for c in value):
+        return False
+    try:
+        parsed=urllib.parse.urlsplit(value)
+        return parsed.scheme=='https' and bool(parsed.hostname) and not parsed.username and not parsed.password and parsed.port!=0
+    except ValueError:
+        return False
+
+
+def provider_json(response):
+    raw=response.read(32769)
+    if len(raw)>32768:
+        raise ValueError('Provider response too large.')
+    result=json.loads(raw)
+    if not isinstance(result,dict):
+        raise ValueError('Invalid provider response.')
+    return result
+
+
+class NoProviderRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def provider_urlopen(req, timeout=20):
+    """Reject all redirects for authenticated provider requests, preserving proxy/TLS defaults."""
+    if not secure_provider_url(req.full_url):
+        raise ValueError('An HTTPS provider endpoint is required.')
+    opener = urllib.request.build_opener(NoProviderRedirect())
+    return opener.open(req, timeout=timeout)
+
+
 def device_label(user_agent):
     ua=str(user_agent or '').lower()
     if 'iphone' in ua:
@@ -228,6 +279,9 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
     def send_json(self, value, status=200, cookie=None):
+        if getattr(self,'_defer_json',False):
+            self._pending_json=(value,status,cookie)
+            return
         data = json.dumps(value).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json')
@@ -251,7 +305,9 @@ class Handler(BaseHTTPRequestHandler):
     def user(self, db):
         row = db.execute('SELECT u.* FROM users u JOIN sessions s ON u.id=s.user_id WHERE s.token=? AND s.expires>?', (self.token_hash(), time.time())).fetchone()
         if row:
-            db.execute('UPDATE sessions SET last_seen=? WHERE token=?', (time.time(), self.token_hash()))
+            session=db.execute('SELECT last_seen FROM sessions WHERE token=?',(self.token_hash(),)).fetchone()
+            if session and session['last_seen'] <= time.time()-60:
+                db.execute('UPDATE sessions SET last_seen=? WHERE token=?', (time.time(), self.token_hash()))
         return row
 
     def allowed(self, u, channel):
@@ -275,10 +331,21 @@ class Handler(BaseHTTPRequestHandler):
         return dict(members=members, devices=devices, current_session_id=current['id'] if current else None, owner_id=u['id'], parental_until=u['parental_until'], bonus_until=u['bonus_until'], subuser_limit=2 if u['bonus_until'] > now else 1, bonus_active=u['bonus_until'] > now, device_limit=DEVICE_LIMIT)
 
     def do_GET(self):
+        self._defer_json=True
+        self._pending_json=None
         try:
             self.get_request()
         except RequestError as error:
-            self.send_json({'error': error.message}, error.status)
+            self.send_json({'error':error.message},error.status)
+        except Exception:
+            self._pending_json=None
+            raise
+        finally:
+            self._defer_json=False
+            if self._pending_json is not None:
+                value,status,cookie=self._pending_json
+                self._pending_json=None
+                self.send_json(value,status,cookie)
 
     def get_request(self):
         path = urllib.parse.urlsplit(self.path).path
@@ -286,7 +353,7 @@ class Handler(BaseHTTPRequestHandler):
             with connect() as db:
                 u = self.user(db)
                 if path == '/api/me':
-                    return self.send_json({'user': public_user(u,db) if u else None, 'billing': billing_ready(), 'plans': plans_for(db, owner_for(db,u)['id'] if u else None), 'currency':'AZN'})
+                    return self.send_json({'user': public_user(u,db) if u else None, 'billing': billing_ready(), 'plans': plans_for(db, owner_for(db,u)['id'] if u else None), 'currency':'AZN','email_delivery':account_security.email_delivery_ready(),'email_verification_required':account_security.production_mode()})
                 if not u:
                     raise RequestError('Please sign in.', 401)
                 if path == '/api/channels':
@@ -301,8 +368,25 @@ class Handler(BaseHTTPRequestHandler):
                         raise RequestError('Channel not found.',404)
                     if not channel['stream']:
                         raise RequestError('This channel is not connected yet. An administrator can add a stream URL.',404)
-                    audit(db,u['id'],'Playback: '+channel['name'])
-                    return self.send_json({'url':channel['stream'],'name':channel['name']})
+                    session=db.execute('SELECT id FROM sessions WHERE token=?',(self.token_hash(),)).fetchone()
+                    # Provider IO must never hold the SQLite writer lock.
+                    db.commit()
+                    try:
+                        details=playback.resolve_playback_details(channel,u,session['id'] if session else '')
+                    except playback.PlaybackError as error:
+                        raise RequestError(str(error),503)
+                    # A device or account may have been revoked while the adapter answered.
+                    db.execute('BEGIN IMMEDIATE')
+                    current=self.user(db)
+                    latest=db.execute('SELECT * FROM channels WHERE id=? AND enabled=1',(channel['id'],)).fetchone()
+                    if not current or not public_user(current,db)['access']:
+                        raise RequestError('Playback access required.',403)
+                    if not latest or not self.allowed(current,latest):
+                        raise RequestError('Channel not found.',404)
+                    if latest['stream']!=channel['stream']:
+                        raise RequestError('The channel source changed. Please try again.',503)
+                    audit(db,current['id'],'Playback: '+latest['name'])
+                    return self.send_json({**details,'name':latest['name']})
                 if path == '/api/family':
                     return self.send_json(self.family(db,u))
                 if path == '/api/orders':
@@ -363,6 +447,21 @@ class Handler(BaseHTTPRequestHandler):
                 remaining-=len(chunk)
 
     def do_POST(self):
+        self._defer_json=True
+        self._pending_json=None
+        try:
+            self.post_request()
+        except Exception:
+            self._pending_json=None
+            raise
+        finally:
+            self._defer_json=False
+            if self._pending_json is not None:
+                value,status,cookie=self._pending_json
+                self._pending_json=None
+                self.send_json(value,status,cookie)
+
+    def post_request(self):
         try:
             length=int(self.headers.get('Content-Length',0))
             if length<0 or length>32768:
@@ -380,6 +479,8 @@ class Handler(BaseHTTPRequestHandler):
             with connect() as db:
                 db.execute('BEGIN IMMEDIATE')
                 u=self.user(db)
+                if path.startswith('/api/account/'):
+                    return self.manage_account(db,u,path,body)
                 if path in ('/api/register','/api/login'):
                     return self.authenticate(db,path,body,u)
                 if not u:
@@ -408,9 +509,13 @@ class Handler(BaseHTTPRequestHandler):
                     return self.manage_family(db,u,path,body)
                 if path=='/api/orders':
                     ensure_owner(u)
+                    if public_user(u,db)['requires_email_verification']:
+                        raise RequestError("Verify the account owner's email address before purchasing a package.",403)
                     return self.send_json({'order':dict(create_order(db,u['id'],body.get('plan')))})
                 if path=='/api/checkout':
                     ensure_owner(u)
+                    if public_user(u,db)['requires_email_verification']:
+                        raise RequestError("Verify the account owner's email address before purchasing a package.",403)
                     if not billing_ready():
                         raise RequestError('Payments are not connected yet. Ask the administrator to configure billing.',503)
                     order=create_order(db,u['id'],body.get('plan'))
@@ -430,6 +535,11 @@ class Handler(BaseHTTPRequestHandler):
     def authenticate(self,db,path,body,current):
         email=str(body.get('email','')).strip().lower()
         password=str(body.get('password',''))
+        try:
+            account_security.take_limit(db,'auth-ip',self.client_address[0],20,900)
+            account_security.take_limit(db,'auth-account',email,20,900)
+        except account_security.LimitExceeded:
+            return self.send_json({'error':'Too many attempts. Try again in 15 minutes.'},429)
         key=self.client_address[0]
         attempt=db.execute('SELECT * FROM attempts WHERE key=?',(key,)).fetchone()
         if attempt and attempt['reset']>time.time() and attempt['count']>=20:
@@ -437,7 +547,7 @@ class Handler(BaseHTTPRequestHandler):
         db.execute('INSERT INTO attempts VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN reset<? THEN 1 ELSE count+1 END,reset=CASE WHEN reset<? THEN excluded.reset ELSE reset END',(key,time.time()+900,time.time(),time.time()))
         if path=='/api/register':
             name=str(body.get('name','')).strip()[:80]
-            if not name or '@' not in email or len(email)>254 or not 10<=len(password)<=256:
+            if not name or not account_security.valid_email(email) or not 10<=len(password)<=256:
                 return self.send_json({'error':'Enter your name, a valid email, and a password of 10–256 characters.'},400)
             try:
                 db.execute('INSERT INTO users(email,name,password,created) VALUES(?,?,?,?)',(email,name,password_hash(password),time.time()))
@@ -467,9 +577,123 @@ class Handler(BaseHTTPRequestHandler):
         cookie=f'session={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age={SESSION_LIFETIME}{secure}'
         if old:
             db.execute('UPDATE sessions SET token=?,user_id=?,expires=?,last_seen=?,label=? WHERE id=?',(hashlib.sha256(token.encode()).hexdigest(),u['id'],time.time()+SESSION_LIFETIME,time.time(),device_label(self.headers.get('User-Agent','')),old['id']))
-            return self.send_json({'user':public_user(u,db)},cookie=cookie)
+            sent=self.signup_verification(db,u) if path=='/api/register' else None
+            return self.send_json({'user':public_user(u,db),'verification_sent':sent},cookie=cookie)
         db.execute('INSERT INTO sessions(token,user_id,expires,id,label,last_seen) VALUES(?,?,?,?,?,?)',(hashlib.sha256(token.encode()).hexdigest(),u['id'],time.time()+SESSION_LIFETIME,secrets.token_urlsafe(12),device_label(self.headers.get('User-Agent','')),time.time()))
-        return self.send_json({'user':public_user(u,db)},cookie=cookie)
+        sent=self.signup_verification(db,u) if path=='/api/register' else None
+        return self.send_json({'user':public_user(u,db),'verification_sent':sent},cookie=cookie)
+
+    def deliver_account_token(self, db, user, purpose, deferred=False):
+        token = account_security.issue_token(db, user['id'], purpose)
+        db.commit()
+        if deferred:
+            # Forgot responses never wait for SMTP, avoiding existence disclosure via network timing.
+            def delivery():
+                try:
+                    account_security.send_account_email(user['email'], purpose, token)
+                except Exception:
+                    with connect() as cleanup:
+                        cleanup.execute('DELETE FROM account_tokens WHERE token_hash=?',(account_security.digest(token),))
+            threading.Thread(target=delivery,daemon=True).start()
+            return True
+        try:
+            account_security.send_account_email(user['email'], purpose, token)
+            return True
+        except Exception:
+            # An uncertain/failed delivery must not leave a usable unattended token.
+            db.execute('DELETE FROM account_tokens WHERE token_hash=?', (account_security.digest(token),))
+            db.commit()
+            return False
+
+    def signup_verification(self, db, user):
+        if not account_security.email_delivery_ready():
+            return False
+        return self.deliver_account_token(db, user, 'verify')
+
+    def account_limit(self, db, scope, identity, maximum, window):
+        try:
+            account_security.take_limit(db, scope, identity, maximum, window)
+            return True
+        except account_security.LimitExceeded:
+            return False
+
+    def revoke_account_sessions(self, db, user):
+        if user['owner_id']:
+            db.execute('DELETE FROM sessions WHERE user_id=?', (user['id'],))
+        else:
+            db.execute('DELETE FROM sessions WHERE user_id=? OR user_id IN (SELECT id FROM users WHERE owner_id=?)', (user['id'], user['id']))
+
+    def manage_account(self, db, user, path, body):
+        if path == '/api/account/forgot':
+            if not account_security.email_delivery_ready():
+                return self.send_json({'error':'Email delivery is not configured.'},503)
+            email = str(body.get('email','')).strip().lower()
+            ip_ok = self.account_limit(db,'forgot-ip',self.client_address[0],10,3600)
+            email_ok = self.account_limit(db,'forgot-account',email,3,3600)
+            if not ip_ok or not email_ok:
+                # Identical response for known and unknown accounts, including limits.
+                return self.send_json({'ok':True,'message':account_security.GENERIC_RESET_MESSAGE})
+            target = db.execute('SELECT * FROM users WHERE email=?', (email,)).fetchone()
+            if target:
+                self.deliver_account_token(db,target,'reset',deferred=True)
+            return self.send_json({'ok':True,'message':account_security.GENERIC_RESET_MESSAGE})
+        if path in ('/api/account/reset','/api/account/verify'):
+            purpose = 'reset' if path.endswith('/reset') else 'verify'
+            if not self.account_limit(db,purpose+'-ip',self.client_address[0],20,900):
+                return self.send_json({'error':'Too many attempts. Try again in 15 minutes.'},429)
+            password = body.get('password','')
+            if purpose == 'reset' and (not isinstance(password,str) or not 10<=len(password)<=256):
+                return self.send_json({'error':'Use a password of 10–256 characters.'},400)
+            uid = account_security.consume_token(db,body.get('token'),purpose)
+            if not uid:
+                return self.send_json({'error':'This account link is invalid or has expired. Request a new email.'},400)
+            target = db.execute('SELECT * FROM users WHERE id=?', (uid,)).fetchone()
+            if not target:
+                return self.send_json({'error':'This account link is invalid or has expired. Request a new email.'},400)
+            if purpose == 'verify':
+                db.execute('UPDATE users SET email_verified=1 WHERE id=?', (uid,))
+                db.execute("DELETE FROM account_tokens WHERE user_id=? AND purpose='verify'",(uid,))
+                audit(db,uid,'Email address verified')
+                return self.send_json({'ok':True})
+            db.execute('UPDATE users SET password=? WHERE id=?',(password_hash(password),uid))
+            db.execute('DELETE FROM account_tokens WHERE user_id=?',(uid,))
+            self.revoke_account_sessions(db,target)
+            audit(db,uid,'Password reset completed')
+            return self.send_json({'ok':True},cookie='session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0')
+        if not user:
+            raise RequestError('Please sign in.',401)
+        if path == '/api/account/password':
+            ip_ok = self.account_limit(db,'password-ip',self.client_address[0],20,900)
+            user_ok = self.account_limit(db,'password-user',user['id'],5,900)
+            if not ip_ok or not user_ok:
+                return self.send_json({'error':'Too many attempts. Try again in 15 minutes.'},429)
+            current = body.get('current_password','')
+            password = body.get('password','')
+            if not isinstance(current,str) or len(current)>256 or not verify(current,user['password']):
+                return self.send_json({'error':'Your current password is incorrect.'},400)
+            if not isinstance(password,str) or not 10<=len(password)<=256:
+                return self.send_json({'error':'Use a password of 10–256 characters.'},400)
+            if verify(password,user['password']):
+                return self.send_json({'error':'Choose a different password.'},400)
+            db.execute('UPDATE users SET password=? WHERE id=?',(password_hash(password),user['id']))
+            db.execute('DELETE FROM account_tokens WHERE user_id=?',(user['id'],))
+            self.revoke_account_sessions(db,user)
+            audit(db,user['id'],'Password changed')
+            return self.send_json({'ok':True},cookie='session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0')
+        if path == '/api/account/resend-verification':
+            ensure_owner(user)
+            if user['email_verified']:
+                return self.send_json({'ok':True})
+            if not account_security.email_delivery_ready():
+                return self.send_json({'error':'Email delivery is not configured.'},503)
+            ip_ok = self.account_limit(db,'verify-mail-ip',self.client_address[0],10,3600)
+            user_ok = self.account_limit(db,'verify-mail-user',user['id'],3,3600)
+            if not ip_ok or not user_ok:
+                return self.send_json({'error':'Too many email requests. Try again in one hour.'},429)
+            if not self.deliver_account_token(db,user,'verify'):
+                return self.send_json({'error':'Email could not be sent. Please try again later.'},503)
+            return self.send_json({'ok':True})
+        raise RequestError('Not found.',404)
 
     def manage_family(self,db,u,path,body):
         ensure_owner(u)
@@ -490,6 +714,7 @@ class Handler(BaseHTTPRequestHandler):
                 raise RequestError('Sub-user not found.',404)
             db.execute('DELETE FROM sessions WHERE user_id=?',(target['id'],))
             db.execute('DELETE FROM favorites WHERE user_id=?',(target['id'],))
+            db.execute('DELETE FROM account_tokens WHERE user_id=?',(target['id'],))
             db.execute('DELETE FROM users WHERE id=?',(target['id'],))
             audit(db,u['id'],'Sub-user removed')
             return self.send_json({'ok':True})
@@ -503,15 +728,19 @@ class Handler(BaseHTTPRequestHandler):
         name=str(body.get('name',target['name'] if target else '')).strip()[:80]
         email=str(body.get('email',target['email'] if target else '')).strip().lower()
         password=str(body.get('password',''))
-        if not name or '@' not in email or len(email)>254 or ((not target or password) and not 10<=len(password)<=256):
+        if not name or not account_security.valid_email(email) or ((not target or password) and not 10<=len(password)<=256):
             raise RequestError('Enter your name, a valid email, and a password of 10–256 characters.')
         if target:
             if db.execute('SELECT 1 FROM users WHERE email=? AND id!=?',(email,target['id'])).fetchone():
                 raise RequestError('This email already has an account. Please sign in.',409)
+            if email != target['email']:
+                db.execute('UPDATE users SET email_verified=0 WHERE id=?',(target['id'],))
+                db.execute('DELETE FROM account_tokens WHERE user_id=?',(target['id'],))
             db.execute('UPDATE users SET name=?,email=?,allowed_categories=? WHERE id=?',(name,email,categories,target['id']))
             if password:
                 db.execute('UPDATE users SET password=? WHERE id=?',(password_hash(password),target['id']))
                 db.execute('DELETE FROM sessions WHERE user_id=?',(target['id'],))
+                db.execute('DELETE FROM account_tokens WHERE user_id=?',(target['id'],))
         else:
             base=db.execute('SELECT COUNT(*) FROM users WHERE owner_id=? AND bonus=0',(u['id'],)).fetchone()[0]
             bonus=db.execute('SELECT COUNT(*) FROM users WHERE owner_id=? AND bonus=1',(u['id'],)).fetchone()[0]
@@ -590,10 +819,10 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 if not adapter.startswith('https://'):
                     raise ValueError()
-                with urllib.request.urlopen(req,timeout=20) as response:
-                    result=json.load(response)
+                with provider_urlopen(req,timeout=20) as response:
+                    result=provider_json(response)
                 url=result['checkout_url']
-                if not isinstance(url,str) or not url.startswith('https://'):
+                if not secure_provider_url(url):
                     raise ValueError()
                 db.execute('UPDATE orders SET provider_session=? WHERE id=?',(str(result.get('session_id',order['id'])),order['id']))
                 return self.send_json({'url':url,'order_id':order['id']})
@@ -606,8 +835,10 @@ class Handler(BaseHTTPRequestHandler):
                 'success_url':base+'/?payment=success&order='+order['id'],'cancel_url':base+'/?payment=cancelled'}
         req=urllib.request.Request('https://api.stripe.com/v1/checkout/sessions',data=urllib.parse.urlencode(fields).encode(),headers={'Authorization':'Bearer '+os.environ['STRIPE_SECRET_KEY'],'Idempotency-Key':order['id']})
         try:
-            with urllib.request.urlopen(req,timeout=20) as response:
-                result=json.load(response)
+            with provider_urlopen(req,timeout=20) as response:
+                result=provider_json(response)
+            if not secure_provider_url(result.get('url')):
+                raise ValueError()
             db.execute('UPDATE orders SET provider_session=? WHERE id=?',(result['id'],order['id']))
             return self.send_json({'url':result['url'],'order_id':order['id']})
         except Exception:
@@ -682,5 +913,7 @@ if __name__=='__main__':
             db.execute("INSERT INTO users(email,name,password,role,created) VALUES(?,?,?,'admin',?)",(args.create_admin.lower(),'Administrator',password_hash(password),time.time()))
         print('Administrator created. Sign in through the app.')
     else:
+        if account_security.production_mode():
+            raise SystemExit('Production must run through the hardened WSGI entry point with Gunicorn, not server.py.')
         print(f'FANnTV listening on port {args.port}',flush=True)
         ThreadingHTTPServer((args.host,args.port),Handler).serve_forever()

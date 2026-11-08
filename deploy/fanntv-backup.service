@@ -1,0 +1,32 @@
+[Unit]
+Description=Create and verify a consistent FANnTV database backup
+After=fanntv.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/fanntv
+Environment=PYTHONDONTWRITEBYTECODE=1
+StateDirectory=fanntv-backups
+StateDirectoryMode=0700
+UMask=0077
+ExecStart=/opt/fanntv/.venv/bin/python /opt/fanntv/scripts/backup.py --database /var/lib/fanntv/fanntv.db --output-dir /var/lib/fanntv-backups --retain 14
+TimeoutStartSec=180
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_UNIX
+SystemCallArchitectures=native
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+AmbientCapabilities=
+ReadOnlyPaths=/var/lib/fanntv
+ReadWritePaths=/var/lib/fanntv-backups

@@ -1,0 +1,53 @@
+name: FANnTV checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  application:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --requirement requirements.txt
+          npm ci --ignore-scripts
+      - name: Refresh vendored assets from the lockfile
+        run: |
+          npm run assets
+          git diff --exit-code -- static/vendor
+      - name: Python and JavaScript checks
+        run: |
+          python -m unittest discover -s tests -v
+          node --check static/app.js
+          node --check static/i18n.js
+          python -m py_compile server.py production.py wsgi.py scripts/backup.py deploy/gunicorn.conf.py
+      - name: Install Chromium for browser workflows
+        run: npx playwright install --with-deps chromium
+      - name: Browser workflows
+        run: |
+          export CHROMIUM_PATH="$(node -e 'process.stdout.write(require("playwright").chromium.executablePath())')"
+          npm run test:browser
+          npm run test:family
+          npm run test:auth
+          FANNTV_TEST_PYTHON=python npm run test:production
+      - name: Retain failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7

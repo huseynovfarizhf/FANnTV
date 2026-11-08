@@ -1,0 +1,33 @@
+# Caddy supplies HTTPS and redirects HTTP automatically. Set FANNTV_DOMAIN and
+# ACME_EMAIL in the Caddy service environment, after pointing DNS at this host.
+{
+	email {$ACME_EMAIL}
+}
+
+{$FANNTV_DOMAIN} {
+	encode zstd gzip
+
+	@api path /api/*
+	request_body @api {
+		max_size 32768
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# Send assets through the application too: the demonstration video requires
+	# an authorized session. Do not add a file_server/static bypass here.
+	reverse_proxy 127.0.0.1:3000 {
+		header_up Host {host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto https
+	}
+
+	# Access logging is deliberately disabled. Verification/reset URL query
+	# strings may contain bearer tokens and must not be written to logs.
+}

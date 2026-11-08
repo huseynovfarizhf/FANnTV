@@ -251,6 +251,67 @@ messages('Card details are entered securely on the payment provider’s page. FA
 
 messages('Order has already been paid with another payment reference.','Bu sifariş artıq başqa ödəniş istinadı ilə ödənilib.','Этот заказ уже оплачен с другим платёжным идентификатором.','此订单已通过其他付款凭证支付。');
 
+// Account verification and recovery.
+messages('Email verified','E-poçt təsdiqlənib','Электронная почта подтверждена','邮箱已验证');
+messages('Email not verified','E-poçt təsdiqlənməyib','Электронная почта не подтверждена','邮箱未验证');
+messages('Email verification is managed by your account owner.','E-poçtun təsdiqini hesab sahibiniz idarə edir.','Подтверждением электронной почты управляет владелец вашего аккаунта.','邮箱验证由您的账户所有者管理。');
+messages('Verify your email to protect your account.','Hesabınızı qorumaq üçün e-poçtunuzu təsdiqləyin.','Подтвердите электронную почту, чтобы защитить аккаунт.','请验证邮箱以保护账户。');
+messages('Send verification email','Təsdiq məktubu göndərin','Отправить письмо для подтверждения','发送验证邮件');
+messages('Ask your account owner to verify their email before watching.','İzləməzdən əvvəl hesab sahibinizdən e-poçtunu təsdiqləməsini xahiş edin.','Перед просмотром попросите владельца аккаунта подтвердить электронную почту.','观看前，请让账户所有者验证邮箱。');
+messages('Verify your email before watching. Check your inbox for the verification link.','İzləməzdən əvvəl e-poçtunuzu təsdiqləyin. Təsdiq keçidi üçün poçt qutunuzu yoxlayın.','Перед просмотром подтвердите электронную почту. Ссылка для подтверждения отправлена на почту.','观看前请验证邮箱，验证链接已发送至您的收件箱。');
+messages('Resend email','Məktubu yenidən göndərin','Отправить письмо ещё раз','重新发送邮件');
+messages('Change password','Şifrəni dəyişin','Изменить пароль','修改密码');
+messages('Forgot password?','Şifrəni unutmusunuz?','Забыли пароль?','忘记密码？');
+messages('ACCOUNT RECOVERY','HESABIN BƏRPASI','ВОССТАНОВЛЕНИЕ АККАУНТА','账户恢复');
+messages('Forgot your password?','Şifrənizi unutmusunuz?','Забыли пароль?','忘记密码？');
+messages('Enter your email address. If an account exists, we will send a password reset link.','E-poçt ünvanınızı daxil edin. Hesab mövcuddursa, şifrənin sıfırlanması üçün keçid göndərəcəyik.','Введите адрес электронной почты. Если аккаунт существует, мы отправим ссылку для сброса пароля.','请输入邮箱地址。如果账户存在，我们将发送密码重置链接。');
+messages('Send reset link','Sıfırlama keçidi göndərin','Отправить ссылку для сброса','发送重置链接');
+messages('Back to sign in','Girişə qayıdın','Назад ко входу','返回登录');
+messages('ACCOUNT SECURITY','HESABIN TƏHLÜKƏSİZLİYİ','БЕЗОПАСНОСТЬ АККАУНТА','账户安全');
+messages('After changing your password, sign in again on your devices.','Şifrənizi dəyişdikdən sonra cihazlarınızda yenidən daxil olun.','После изменения пароля войдите заново на своих устройствах.','修改密码后，请在各设备上重新登录。');
+messages('Current password','Cari şifrə','Текущий пароль','当前密码');
+messages('New password','Yeni şifrə','Новый пароль','新密码');
+messages('Confirm new password','Yeni şifrəni təsdiqləyin','Подтвердите новый пароль','确认新密码');
+messages('Update password','Şifrəni yeniləyin','Обновить пароль','更新密码');
+messages('Choose a new password','Yeni şifrə seçin','Выберите новый пароль','设置新密码');
+messages('This reset link can be used once. Your other sessions will be signed out.','Bu sıfırlama keçidi bir dəfə istifadə oluna bilər. Digər sessiyalarınız bağlanacaq.','Эту ссылку для сброса можно использовать один раз. Другие сеансы будут завершены.','此重置链接只能使用一次，其他登录会话将被退出。');
+messages('Reset password','Şifrəni sıfırlayın','Сбросить пароль','重置密码');
+messages('Verify your email','E-poçtunuzu təsdiqləyin','Подтвердите электронную почту','验证邮箱');
+messages('Confirm this email address to finish securing your FANnTV account.','FANnTV hesabınızın qorunmasını tamamlamaq üçün bu e-poçt ünvanını təsdiqləyin.','Подтвердите этот адрес электронной почты, чтобы завершить защиту аккаунта FANnTV.','请确认此邮箱地址，以完成FANnTV账户安全设置。');
+messages('Verify email','E-poçtu təsdiqləyin','Подтвердить почту','验证邮箱');
+messages('This link is invalid.','Bu keçid etibarsızdır.','Эта ссылка недействительна.','此链接无效。');
+messages('Request a new email and use the latest link.','Yeni məktub istəyin və ən son keçiddən istifadə edin.','Запросите новое письмо и используйте последнюю ссылку.','请重新请求邮件并使用最新链接。');
+messages('Request a new reset link','Yeni sıfırlama keçidi istəyin','Запросить новую ссылку для сброса','请求新的重置链接');
+messages('Your email address has been verified. You can return to FANnTV.','E-poçt ünvanınız təsdiqləndi. FANnTV-yə qayıda bilərsiniz.','Ваш адрес электронной почты подтверждён. Можно вернуться в FANnTV.','您的邮箱已验证，可以返回FANnTV。');
+messages('Continue','Davam edin','Продолжить','继续');
+messages('If verification is needed, a verification email will be sent.','Təsdiq tələb olunarsa, təsdiq məktubu göndəriləcək.','Если требуется подтверждение, будет отправлено письмо.','如需验证，将发送验证邮件。');
+messages('Check your inbox','Poçt qutunuzu yoxlayın','Проверьте почту','查看收件箱');
+messages('If the account exists, a password reset email will be sent.','Hesab mövcuddursa, şifrənin sıfırlanması üçün məktub göndəriləcək.','Если аккаунт существует, будет отправлено письмо для сброса пароля.','如果账户存在，将发送密码重置邮件。');
+messages('Use the latest link from your email. Password reset links expire after 30 minutes.','E-poçtunuzdakı ən son keçiddən istifadə edin. Şifrə sıfırlama keçidlərinin müddəti 30 dəqiqədir.','Используйте последнюю ссылку из письма. Ссылки для сброса пароля действуют 30 минут.','请使用邮件中的最新链接。密码重置链接在30分钟后失效。');
+messages('The new passwords do not match.','Yeni şifrələr uyğun gəlmir.','Новые пароли не совпадают.','两次输入的新密码不一致。');
+messages('Password reset. Please sign in with your new password.','Şifrə sıfırlandı. Yeni şifrənizlə daxil olun.','Пароль сброшен. Войдите с новым паролем.','密码已重置，请使用新密码登录。');
+messages('Password changed. Please sign in again.','Şifrə dəyişdirildi. Yenidən daxil olun.','Пароль изменён. Войдите снова.','密码已修改，请重新登录。');
+messages('Email delivery is not configured.','E-poçt göndərişi quraşdırılmayıb.','Отправка почты не настроена.','邮件发送尚未配置。');
+
+messages('Use a password of 10–256 characters.','10–256 simvolluq şifrə istifadə edin.','Используйте пароль из 10–256 символов.','请使用10–256个字符的密码。');
+messages('This account link is invalid or has expired. Request a new email.','Bu hesab keçidi etibarsızdır və ya müddəti bitib. Yeni məktub istəyin.','Эта ссылка недействительна или её срок истёк. Запросите новое письмо.','此账户链接无效或已过期，请重新请求邮件。');
+messages('Your current password is incorrect.','Cari şifrəniz yanlışdır.','Текущий пароль неверен.','当前密码不正确。');
+messages('Choose a different password.','Fərqli şifrə seçin.','Выберите другой пароль.','请选择不同的密码。');
+messages('Too many email requests. Try again in one hour.','Çox sayda e-poçt sorğusu. Bir saatdan sonra yenidən sınayın.','Слишком много запросов писем. Повторите через час.','邮件请求过多，请一小时后重试。');
+messages('Email could not be sent. Please try again later.','Məktub göndərilə bilmədi. Daha sonra yenidən sınayın.','Не удалось отправить письмо. Повторите позже.','邮件发送失败，请稍后重试。');
+messages('Email address verified','E-poçt ünvanı təsdiqləndi','Электронная почта подтверждена','邮箱已验证');
+messages('Password reset completed','Şifrənin sıfırlanması tamamlandı','Сброс пароля завершён','密码重置已完成');
+messages('Password changed','Şifrə dəyişdirildi','Пароль изменён','密码已修改');
+messages('Verify your email before watching.','İzləməzdən əvvəl e-poçtunuzu təsdiqləyin.','Перед просмотром подтвердите электронную почту.','观看前请验证邮箱。');
+
+messages("Verify the account owner's email address before purchasing a package.",'Paket almadan əvvəl hesab sahibinin e-poçt ünvanını təsdiqləyin.','Перед покупкой пакета подтвердите электронную почту владельца аккаунта.','购买套餐前，请验证账户所有者的邮箱。');
+
+
+messages('Protected playback is not configured. Contact the administrator.','Qorunan yayım quraşdırılmayıb. Administratorla əlaqə saxlayın.','Защищённое воспроизведение не настроено. Свяжитесь с администратором.','受保护的播放尚未配置，请联系管理员。');
+messages('The protected stream is unavailable. Please try again later.','Qorunan yayım əlçatan deyil. Daha sonra yenidən sınayın.','Защищённый поток недоступен. Повторите позже.','受保护的流媒体暂不可用，请稍后重试。');
+messages('Unexpected server error.','Gözlənilməz server xətası.','Непредвиденная ошибка сервера.','服务器出现意外错误。');
+messages('Service is not ready.','Xidmət hazır deyil.','Сервис не готов.','服务尚未就绪。');
+
 function supportedLanguage(value) {
   const base=String(value||'').toLowerCase().split('-')[0];
   return base==='zh'?'zh-CN':['az','en','ru'].includes(base)?base:null;

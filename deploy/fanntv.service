@@ -1,0 +1,48 @@
+[Unit]
+Description=FANnTV application
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=fanntv
+Group=fanntv
+WorkingDirectory=/opt/fanntv
+EnvironmentFile=/etc/fanntv/fanntv.env
+Environment=FANNTV_ENV=production
+Environment=FANNTV_DB=/var/lib/fanntv/fanntv.db
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+StateDirectory=fanntv
+StateDirectoryMode=0700
+RuntimeDirectory=fanntv
+RuntimeDirectoryMode=0700
+UMask=0077
+ExecStart=/opt/fanntv/.venv/bin/gunicorn --config /opt/fanntv/deploy/gunicorn.conf.py wsgi:application
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGQUIT
+TimeoutStopSec=45
+LimitNOFILE=65536
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/var/lib/fanntv /run/fanntv
+
+[Install]
+WantedBy=multi-user.target

@@ -8,7 +8,9 @@
     "test": "python3 -m unittest discover -s tests -v",
     "assets": "node scripts/copy-vendor.mjs",
     "test:browser": "node tests/browser.mjs",
-    "test:family": "node tests/billing-family.mjs"
+    "test:family": "node tests/billing-family.mjs",
+    "test:auth": "node tests/auth-browser.mjs",
+    "test:production": "node tests/gunicorn-smoke.mjs"
   },
   "dependencies": {
     "hls.js": "1.6.16",

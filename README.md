@@ -83,9 +83,15 @@ npm run test:family
 
 Set `CHROMIUM_PATH` if needed. Tests use isolated temporary databases; browser screenshots go to ignored `test-results/`. They exercise trial expiry, inherited family access, devices, parental restrictions, prices, verified payment activation and replay handling, calendar terms, localization, video playback, and administrator workflows. Real bank charges are not exercised.
 
+## Production deployment
+
+See [PRODUCTION.md](PRODUCTION.md) for the production review, Linux VPS installation, HTTPS, SMTP account verification/recovery, protected playback, backups, monitoring, and remaining launch requirements. Production uses the pinned dependencies in `requirements.txt` and `wsgi:application` under Gunicorn; the development server refuses production mode. SQLite migrations preserve existing accounts, which must verify their email before production playback/purchases (platform admin exempt).
+
+Additional checks: `npm run test:auth` uses a mail fixture; `npm run test:production` exercises the actual Gunicorn workers with local proxy headers (install production dependencies in `.venv` first). No real emails, bank charges, or provider streams are used.
+
 ## Deployment and store releases
 
-This is a web application, not published native/store packages. Desktop Chromium and mobile viewport tests do not certify physical TV/mobile hardware. Before public launch, complete HTTPS production hosting, backups, monitoring, email verification/recovery, billing self-service, provider-side playback protection, and a production security review. The Python standard-library development server is not a public production edge.
+This is a web application, not published native/store packages. Desktop Chromium and mobile viewport tests do not certify physical TV/mobile hardware. Before public launch, configure and validate the included HTTPS hosting, backups, monitoring and email verification/recovery; complete billing self-service, staff access protection and real provider-side playback integration. The Python standard-library development server is not a public production edge.
 
 Android/iOS store billing and packages, Samsung Tizen, LG webOS, and Android/Google TV packaging for Sony remain separate release work. Program guides, M3U imports, catch-up TV, and full video-on-demand catalogs are not included. Connect only content you are authorized to distribute.
 

@@ -1,0 +1,4 @@
+# Linux production runtime. Local development server uses the Python standard library.
+gunicorn==26.2.0
+packaging==26.3
+tzdata==2026.6
