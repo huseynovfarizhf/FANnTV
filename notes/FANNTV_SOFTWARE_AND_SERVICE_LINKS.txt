@@ -1,0 +1,94 @@
+FANnTV - SOFTWARE DOWNLOADS AND SERVICE LINKS
+Prepared: 9 November 2026 (Azerbaijan time)
+
+CLOUD SERVER - RENT ONLINE
+
+DigitalOcean:
+https://www.digitalocean.com/products/droplets
+
+Hetzner Cloud:
+https://www.hetzner.com/cloud/
+
+No cloud download is required. Register with a provider, create a server,
+and select Ubuntu 24.04 LTS as its operating-system image.
+
+YOUR WINDOWS COMPUTER
+
+PowerShell:
+Already included with Windows. Use it for local commands and SSH connections.
+
+Git:
+https://git-scm.com/downloads
+Downloads project code and later updates. You already used Git for FANnTV.
+
+Python:
+https://www.python.org/downloads/
+Use Python 3.12 or newer for local testing. You already have Python installed.
+Windows timezone support: py -m pip install tzdata
+
+Visual Studio Code (optional editor):
+https://code.visualstudio.com/download
+Useful for viewing code and editing configuration files.
+
+LINUX SERVER SOFTWARE
+
+Ubuntu Server information/download:
+https://ubuntu.com/download/server
+For a rented VPS, select Ubuntu in the provider's dashboard. An ISO download
+is only needed if you are installing the operating system yourself.
+
+Caddy HTTPS server:
+https://caddyserver.com/docs/install
+Install on the Linux server using the official instructions.
+
+Gunicorn application server:
+https://docs.gunicorn.org/en/stable/install.html
+Use the project's pinned requirements.txt and deployment guide on Linux.
+Gunicorn is not needed to run the Windows development server.
+
+FFmpeg (optional video conversion):
+https://ffmpeg.org/download.html
+Useful for preparing compatible videos. MP4 with H.264 video and AAC audio
+is a practical cross-device starting format; test your target devices.
+
+PostgreSQL (needed when the app is adapted for multiple servers):
+https://www.postgresql.org/download/
+A managed PostgreSQL service is an alternative to installing it yourself.
+The current SQLite application needs a code/data migration before use.
+
+MANAGED VIDEO SERVICES - SIGN UP ONLINE
+
+Bunny Stream:
+https://bunny.net/stream/
+
+Cloudflare Stream:
+https://www.cloudflare.com/developer-platform/products/cloudflare-stream/
+
+These require an account, integration and a delivery/storage budget.
+They are not included automatically with your cloud server.
+
+EMAIL SERVICE EXAMPLES - SIGN UP ONLINE
+
+Brevo:
+https://www.brevo.com/
+
+Postmark:
+https://postmarkapp.com/
+
+Use a provider's secure SMTP configuration and configure your sender domain.
+Verify real email delivery before public registration.
+
+PROJECT LINKS
+
+FANnTV source:
+https://github.com/huseynovfarizhf/FANnTV
+
+Production review and deployment guide:
+https://github.com/huseynovfarizhf/FANnTV/blob/main/PRODUCTION.md
+
+Payment integration guide:
+https://github.com/huseynovfarizhf/FANnTV/blob/main/PAYMENTS.md
+
+Choose current service plans and regions after checking the provider's
+pricing, availability and suitability for your business in Azerbaijan.
+Never enter provider passwords, API keys or payment secrets into public code.

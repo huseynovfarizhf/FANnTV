@@ -1,0 +1,144 @@
+FANnTV - CLOUD SETUP AND FUTURE EXPANSION GUIDE
+Prepared: 9 November 2026 (Azerbaijan time)
+
+A cloud server is rented through a hosting website. You do not download the
+cloud. The provider creates a remote computer and installs its operating
+system. You can manage that Linux server from your Windows computer.
+
+RECOMMENDED STARTING POINT
+
+- One Ubuntu 24.04 LTS cloud server (VPS).
+- Around 2 CPU cores and 4 GB RAM for a small pilot.
+- Persistent storage, a domain name, HTTPS, backups and monitoring.
+- Actual capacity must be measured before accepting a large audience.
+- Video storage and delivery costs are separate from running the app.
+
+Cloud provider options:
+
+DigitalOcean - a reasonable beginner-friendly starting choice:
+https://www.digitalocean.com/products/droplets
+
+Hetzner Cloud - another option to compare:
+https://www.hetzner.com/cloud/
+
+Compare current compute, storage, backup and bandwidth costs before buying.
+Choose a region with good tested connectivity from Azerbaijan. Avoid buying
+long commitments before testing the application and video delivery.
+
+STEP-BY-STEP PLAN
+
+1. Create an account with your chosen cloud provider.
+
+2. Create one server. Select Ubuntu 24.04 LTS in the provider's dashboard.
+   You do not need to download Ubuntu or install it on your Windows PC.
+   Use SSH keys and follow the provider's instructions for securing access.
+
+3. Note the server's IP address and SSH username. Open Windows PowerShell
+   and connect with this command, replacing both placeholders:
+
+   ssh YOUR_SERVER_USER@YOUR_SERVER_IP
+
+   After connecting, commands in that terminal run on the Linux server.
+   Your computer remains Windows; the remote server runs Linux.
+
+4. Buy a domain name and point its DNS records to the server.
+   Configure HTTPS and keep the app's internal port 3000 off the public
+   Internet. The public site should be accessed over HTTPS on port 443.
+
+5. Install the FANnTV code and production dependencies. Follow the detailed
+   project deployment guide rather than exposing the development server:
+
+   https://github.com/huseynovfarizhf/FANnTV/blob/main/PRODUCTION.md
+
+   Project source:
+   https://github.com/huseynovfarizhf/FANnTV
+
+   Production uses Gunicorn behind Caddy. The existing command
+   "py server.py --port 3000" is for local Windows testing, not a public
+   production deployment.
+
+6. Connect the external services:
+   - Email delivery for account verification and password recovery.
+   - An acquiring bank/payment provider with AZN merchant support.
+   - Licensed IPTV streams and protected playback.
+   - Video storage/delivery for movies, anime and teaching lessons.
+
+   Card entry belongs on the payment provider's secure HTTPS checkout.
+   Do not collect or store card numbers, expiry dates or CVV in FANnTV.
+   Never place passwords or provider secrets in GitHub or chat.
+
+7. Configure database and video backups, encrypted off-site copies,
+   monitoring, admin access protection and a restore procedure.
+   Database backups alone do not preserve uploaded lesson/movie files.
+
+8. Test privately before accepting paying users. Test real email delivery,
+   a real low-value AZN payment, failed/retried payments, video playback,
+   parental restrictions, four-device limits, server restarts and restores.
+
+VIDEO STORAGE AND DELIVERY
+
+Possible managed video services:
+
+Bunny Stream:
+https://bunny.net/stream/
+
+Cloudflare Stream:
+https://www.cloudflare.com/developer-platform/products/cloudflare-stream/
+
+These are services you subscribe to, not programs to download. Connecting a
+service requires integration and credentials; listing a service here does
+not mean FANnTV is already connected to it.
+
+A video service/CDN can handle large video files, encoding and delivery
+while you manage one application server. Live TV must come from a provider
+you are authorized to use. Cloud hosting does not provide TV content rights.
+
+The local-upload catalog work still needs final validation before release.
+Shared cloud/object-storage support must be implemented and tested before
+relying on it across multiple application servers.
+
+FUTURE: EXPAND TO TWO, THREE OR MORE SERVERS
+
+Target application structure:
+
+Customers
+    -> HTTPS load balancer
+        -> FANnTV application server 1
+        -> FANnTV application server 2
+        -> FANnTV application server 3
+             -> Shared PostgreSQL database
+
+Video storage/CDN
+    -> Delivers video to customers
+
+The current production baseline is a single-server SQLite application.
+Before starting multiple copies, the project needs these changes:
+
+1. Migrate SQLite to a shared PostgreSQL database and adapt the application's
+   database queries and transaction/locking behavior.
+2. Store uploaded videos in shared private storage or a managed video service.
+3. Place the application servers behind a load balancer.
+4. Keep accounts, prices, payments, device/session limits, watch progress
+   and parental controls in the same central database.
+5. Preserve atomic payment activation and four-device admission across all
+   servers. Run schema migrations in a controlled deployment step.
+6. Coordinate email/background jobs, secrets, backups and monitoring.
+7. Test multi-server payment retries, failover and concurrent device access.
+
+Do not copy the SQLite database separately onto each application server or
+place it on a shared network filesystem as a scaling shortcut. Independent
+copies would split user accounts, payments and device limits.
+
+PostgreSQL information:
+https://www.postgresql.org/
+
+Managed database option:
+https://www.digitalocean.com/products/managed-databases
+
+You can start with one application server and make these changes before
+adding the second server. A second server alone does not supply more video
+bandwidth; video delivery must scale through its provider/CDN.
+
+SOFTWARE DOWNLOADS
+
+See FANNTV_SOFTWARE_AND_SERVICE_LINKS.txt for the software and service list.
