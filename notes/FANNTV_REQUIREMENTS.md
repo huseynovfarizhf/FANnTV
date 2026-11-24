@@ -1,0 +1,8 @@
+# FANnTV requirements and status
+
+| Requirement | Expected behavior | Current status |
+| --- | --- | --- |
+| Phones, TVs, and PC | One account works across Android phones, iPhones, Samsung Tizen TVs, LG webOS TVs, Sony Android TV and Google TV models, and PC browsers. Package each store release and test it on its target devices. | The web app has desktop, mobile, and remote-friendly TV layouts. Store packaging and target-device testing are pending. |
+| Four devices, expandable to six | Four signed-in devices are included per household. The owner can buy two extra slots monthly or yearly. The platform admin sets each price in AZN globally or per household. Verified payment raises only the paying household's limit to six. Expiry returns it to four. | The four-device household limit is implemented. Add-on plans, pricing, payment activation, and expiry are pending. |
+| Parental controls | The owner can restrict individual devices, so devices can have different channel selections. Children cannot remove restrictions, and their profile restrictions follow them across devices. | Owner-managed channel category restrictions follow each restricted profile. Per-device restrictions are pending. |
+| Account and payment privacy | Households can see only their own profiles, devices, viewing history, and billing. Payments, household-specific price changes, and cancellations affect only the relevant household. Repeated bank confirmations apply a purchase once. | Profiles, devices, and billing are household-scoped. Household price overrides and duplicate payment protection are implemented. Viewing history and self-service cancellation are pending. Live bank integration requires provider configuration and validation. |
