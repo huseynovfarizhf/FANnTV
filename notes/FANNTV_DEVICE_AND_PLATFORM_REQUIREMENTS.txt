@@ -1,0 +1,11 @@
+FANnTV product requirements
+
+Support Android, iOS, Sony Android or Google TV, Samsung Tizen, LG webOS, and PC browsers.
+
+Include four simultaneous devices per household. Offer one monthly or yearly add-on for two more slots. Admin sets prices in AZN globally or per household. On expiry, restore the four-device limit. Keep the base subscription term separate.
+
+Allow the owner to set parental controls per device. Preserve stricter child profile limits. Keep household profiles, sessions, history, pricing and payments private. Apply a verified payment once to the household that owns the order.
+
+Plan for over 100,000 accounts and about 10,000 simultaneous viewers. Test that when household A buys two slots, A can use six devices and B stays at four with unchanged billing and settings.
+
+Implementation and store releases are pending.
