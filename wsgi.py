@@ -29,7 +29,7 @@ LOGGER.propagate = False
 MAX_BODY = 32768
 SECURITY_HEADERS = [
     ('X-Content-Type-Options', 'nosniff'), ('X-Frame-Options', 'DENY'),
-    ('Referrer-Policy', 'no-referrer'), ('Permissions-Policy', 'camera=(), microphone=(), geolocation=()'),
+    ('Referrer-Policy', 'no-referrer'), ('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=()'),
     ('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; media-src 'self' https: blob:; connect-src 'self' https:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"),
 ]
 

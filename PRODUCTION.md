@@ -117,3 +117,9 @@ Before public paid launch, verify on staging:
 6. Customer-facing terms/privacy/refund pages, content rights, support and incident ownership. If distributing through stores, complete platform packages, store billing integration and review separately.
 
 CI, local SMTP fixtures, mocked banks and generated video do not substitute for these live acceptance checks. This workspace has not deployed a public server or issued a real TLS certificate; Caddy and systemd units must be validated on the selected host.
+
+## Video calls
+
+FANnTV exchanges short-lived WebRTC connection descriptions through the same HTTPS app. Camera and microphone use requires browser permission. The browsers send encrypted call media to each other directly when possible. Calls neither carry IPTV video nor share channel choices. FANnTV does not record the call. The app database temporarily contains connection descriptions, which can include network addresses. Expired rooms are pruned during call requests. Keep database backups private.
+
+The app defaults to a public STUN server for address discovery. Set `FANNTV_STUN_URL` to a trusted alternative, or set it to an empty value to disable STUN. For reliable calls across mobile carriers and restrictive networks, configure a TURN provider with coturn-compatible shared-secret authentication. Set `FANNTV_TURN_URLS` to the provider's space-separated relay URLs and `FANNTV_TURN_SECRET` to the shared secret in the systemd environment file. The app issues expiring relay credentials to participants. A managed TURN relay can handle call bandwidth separately from the app VPS. Verify direct and relayed calls with two devices on different networks before launch.

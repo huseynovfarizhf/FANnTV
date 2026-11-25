@@ -96,3 +96,11 @@ This is a web application, not published native/store packages. Desktop Chromium
 Android/iOS store billing and packages, Samsung Tizen, LG webOS, and Android/Google TV packaging for Sony remain separate release work. Program guides, M3U imports, catch-up TV, and full video-on-demand catalogs are not included. Connect only content you are authorized to distribute.
 
 Alpine artwork and the demo clip are generated assets. Library/font license texts are retained under `static/vendor/`.
+
+## Video calls
+
+Select **Video call** in the header or channel player, allow camera and microphone access, and share the private invite link. The guest signs in and accepts the invitation. Each caller chooses their own channel and can change channels or end the call independently. Invitations admit one guest and expire after ten minutes if unused. The call includes microphone mute, camera on/off, and a local preview.
+
+Camera and microphone access requires HTTPS (or loopback for local development) and a compatible browser. Built-in and external cameras use the device selected by the browser or operating system. Test smart-TV browser compatibility on the target models. To see the call and channel at the same time, keep playback in the FANnTV page. See [production video call setup](PRODUCTION.md#video-calls) for relay configuration.
+
+Run `npm run test:video-call` with Chromium to exercise the two-browser call flow. Set `FANNTV_TEST_MOCK_WEBRTC=1` to test signaling and interface behavior in a browser environment that restricts WebRTC networking.

@@ -26,3 +26,32 @@
 .verification-banner{display:flex;align-items:center;gap:12px;margin:22px 40px 0;padding:15px 18px;border:1px solid #78603a;border-radius:9px;background:#30291b;color:#e9d5ab;font-size:12px}.verification-banner>.icon{flex-shrink:0;color:#e9c87b}.verification-banner>.text-button{margin-left:auto;white-space:nowrap;flex-shrink:0}.account-email-status{display:flex;align-items:flex-start;flex-direction:column;gap:4px;margin:16px 0 20px}.account-email-status p{font-size:11px;margin:5px 0}.account-email-status .text-button{margin-top:2px}.account-signout{display:flex;margin-top:12px;gap:9px}#forgot-password-form label,#reset-password-form label,#change-password-form label{display:flex;flex-direction:column;gap:7px}#forgot-password-form input,#reset-password-form input,#change-password-form input{width:100%}#change-password-form button,#reset-password-form button,#forgot-password-form button{margin-top:17px}.modal .brand{max-width:calc(100% - 30px)}
 @media(max-width:760px){.verification-banner{margin:18px 22px 0;flex-wrap:wrap}.verification-banner>span{flex:1;min-width:180px}.verification-banner>.text-button{margin-left:33px}}
 @media(max-width:480px){.verification-banner{margin:16px 20px 0;padding:13px;font-size:11px}.verification-banner>span{min-width:150px}.verification-banner>.text-button{white-space:normal}}
+
+/* The call panel moves between the page and player without recreating its media elements. */
+#video-call-panel {
+ position:fixed; right:1rem; bottom:1rem; z-index:150;
+ width:min(19rem, calc(100vw - 2rem)); padding:.8rem;
+ background:#101a24; color:#e3efeb; border:1px solid #396551; border-radius:.75rem;
+ box-shadow:0 .5rem 2rem #0008;
+}
+#video-call-panel[hidden], #video-call-panel [hidden] {display:none}
+.video-call-picture {position:relative; aspect-ratio:16/9; background:#05090d; border-radius:.5rem; overflow:hidden}
+.call-remote, .call-local {position:absolute; object-fit:contain; background:#05090d}
+.call-remote {width:100%; height:100%}
+.call-local {right:.4rem; bottom:.4rem; width:30%; aspect-ratio:16/9; border:1px solid #ffffff5c; border-radius:.25rem}
+.call-status {margin:.5rem 0; font-size:.85rem}
+.call-link {width:100%; margin-bottom:.5rem}
+.call-actions {display:flex; flex-wrap:wrap; gap:.4rem}
+.call-actions button, .video-call-launch, .player-header [data-action="video-call"] {font-size:.8rem; padding:.4rem .6rem; min-height:2rem}
+.player-header [data-action="video-call"] {margin-top:.5rem}
+.modal #video-call-panel {position:relative; inset:auto; width:100%; margin-top:1rem}
+@media (min-width:800px) {
+ .modal:has(#player):has(#video-call-panel:not([hidden])) {
+  display:grid; grid-template-columns:minmax(0, 1fr) minmax(14rem, 27%); column-gap:1rem; width:1120px;
+ }
+ .modal:has(#player) > :is(.player-header, .fineprint, .form-error) {grid-column:1 / -1}
+ .modal:has(#player) #video-call-panel {grid-row:2; grid-column:2; align-self:start}
+}
+@media (max-width:640px) {
+ #video-call-panel {bottom:calc(4.5rem + env(safe-area-inset-bottom))}
+}

@@ -19,6 +19,7 @@ from zoneinfo import ZoneInfo
 
 import account_security
 import playback
+import video_calls
 
 ROOT = Path(__file__).parent
 DB = os.environ.get('FANNTV_DB', str(ROOT / 'instance' / 'fanntv.db'))
@@ -84,6 +85,7 @@ def initialize():
                 if column not in present:
                     db.execute(f'ALTER TABLE {table} ADD COLUMN {column} {declaration}')
         account_security.initialize(db)
+        video_calls.initialize(db)
         for row in db.execute('SELECT token FROM sessions WHERE id IS NULL').fetchall():
             db.execute('UPDATE sessions SET id=? WHERE token=?', (secrets.token_urlsafe(12), row['token']))
         db.execute('CREATE UNIQUE INDEX IF NOT EXISTS sessions_public_id ON sessions(id)')
@@ -488,6 +490,15 @@ class Handler(BaseHTTPRequestHandler):
                 if path=='/api/logout':
                     db.execute('DELETE FROM sessions WHERE token=?',(self.token_hash(),))
                     return self.send_json({'ok':True},cookie='session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0')
+                if path.startswith('/api/video-call/'):
+                    user = public_user(u, db)
+                    if user['suspended'] or not user['active'] or user['requires_email_verification']:
+                        raise RequestError('Video calling is unavailable for this account.',403)
+                    try:
+                        result = video_calls.manage(db, path.rsplit('/',1)[-1], body, self.token_hash())
+                    except video_calls.CallError as error:
+                        return self.send_json({'error': error.message}, error.status)
+                    return self.send_json(result)
                 if path=='/api/play/heartbeat':
                     if not public_user(u,db)['access']:
                         raise RequestError('Your access has ended. Choose a subscription to keep watching.',403)
